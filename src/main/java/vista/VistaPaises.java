@@ -74,7 +74,6 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
-        txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
         txtcontinente.setText("Ingrese Un Continente");
         txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -90,7 +89,6 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
-        txtnombre.setForeground(new java.awt.Color(153, 153, 153));
         txtnombre.setText("Ingrese Un Nombre");
         txtnombre.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -101,7 +99,6 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
-        txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
         txtpoblacion.setText("Ingrese Una Poblacion");
         txtpoblacion.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -119,7 +116,15 @@ public class VistaPaises extends javax.swing.JFrame {
             new String [] {
                 "Codigo", "Nombre", "Continente", "Poblacion"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         btnagregar.setText("Agregar");
@@ -214,7 +219,15 @@ public class VistaPaises extends javax.swing.JFrame {
         fila[2] = txtcontinente.getText();
         fila[3] = txtpoblacion.getText();
         
-
+        if (jTable1.getModel().getRowCount() == 0) {
+           
+            JOptionPane.showMessageDialog(
+                null,
+                "La tabla está vacía. Ingrese al menos un registro.",
+                "Faltan Datos en la Tabla",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        }
         // 3. Agregamos la fila al modelo.
         modelo.addRow(fila);
 
@@ -231,17 +244,17 @@ public class VistaPaises extends javax.swing.JFrame {
             if(txtcodigo.getText().equals("Ingrese Un Codigo"))
         {
             txtcodigo.setText("");
-            txtcodigo.setForeground(new Color(153,153,153));
+            txtcodigo.setForeground(new Color(0,0,0));
         }
     }//GEN-LAST:event_txtcodigoFocusGained
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
         // TODO add your handling code here:
-                if(txtcodigo.getText().equals(""))
-        {
-            txtcodigo.setText("Ingrese Un Codigo");
+        if(txtcodigo.getText().equals("")){
+            txtcodigo.setText("Ingrese un codigo");
             txtcodigo.setForeground(new Color(153,153,153));
         }
+       
     }//GEN-LAST:event_txtcodigoFocusLost
 
     private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
@@ -249,17 +262,13 @@ public class VistaPaises extends javax.swing.JFrame {
                 if(txtnombre.getText().equals("Ingrese Un Nombre"))
         {
             txtnombre.setText("");
-            txtnombre.setForeground(new Color(153,153,153));
+            txtnombre.setForeground(new Color(0,0,0));
         }
     }//GEN-LAST:event_txtnombreFocusGained
 
     private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
         // TODO add your handling code here:
-                if(txtnombre.getText().equals(""))
-        {
-            txtnombre.setText("Ingrese Un Nombre");
-            txtnombre.setForeground(new Color(153,153,153));
-        }
+       
     }//GEN-LAST:event_txtnombreFocusLost
 
     private void txtcontinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcontinenteActionPerformed
@@ -271,17 +280,13 @@ public class VistaPaises extends javax.swing.JFrame {
                 if(txtcontinente.getText().equals("Ingrese Un Continente"))
         {
             txtcontinente.setText("");
-            txtcontinente.setForeground(new Color(153,153,153));
+            txtcontinente.setForeground(new Color(0,0,0));
         }
     }//GEN-LAST:event_txtcontinenteFocusGained
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
         // TODO add your handling code here:
-                if(txtcontinente.getText().equals(""))
-        {
-            txtcontinente.setText("Ingrese Un Continente");
-            txtcontinente.setForeground(new Color(153,153,153));
-        }
+        
     }//GEN-LAST:event_txtcontinenteFocusLost
 
     private void txtpoblacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusGained
@@ -289,17 +294,13 @@ public class VistaPaises extends javax.swing.JFrame {
                 if(txtpoblacion.getText().equals("Ingrese Una Poblacion"))
         {
             txtpoblacion.setText("");
-            txtpoblacion.setForeground(new Color(153,153,153));
+            txtpoblacion.setForeground(new Color(0,0,0));
         }
     }//GEN-LAST:event_txtpoblacionFocusGained
 
     private void txtpoblacionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusLost
         // TODO add your handling code here:
-                if(txtpoblacion.getText().equals(""))
-        {
-            txtpoblacion.setText("Ingrese Una Poblacion");
-            txtpoblacion.setForeground(new Color(153,153,153));
-        }
+        
     }//GEN-LAST:event_txtpoblacionFocusLost
 
     /**
