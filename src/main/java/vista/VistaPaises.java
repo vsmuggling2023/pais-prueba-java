@@ -5,6 +5,7 @@
 package vista;
 
 import java.awt.Color;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -204,17 +205,18 @@ public class VistaPaises extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
-    DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
-    // 2. Creamos un array (una fila) con los datos de los campos de texto.
-    Object[] fila = new Object[4];
-    fila[0] = txtcodigo.getText();
-    fila[1] = txtnombre.getText();
-    fila[2] = txtcontinente.getText();
-    fila[3] = txtpoblacion.getText();
+        // 2. Creamos un array (una fila) con los datos de los campos de texto.
+        Object[] fila = new Object[4];
+        fila[0] = txtcodigo.getText();
+        fila[1] = txtnombre.getText();
+        fila[2] = txtcontinente.getText();
+        fila[3] = txtpoblacion.getText();
+        
 
-    // 3. Agregamos la fila al modelo.
-    modelo.addRow(fila);
+        // 3. Agregamos la fila al modelo.
+        modelo.addRow(fila);
 
    
     }//GEN-LAST:event_btnagregarActionPerformed

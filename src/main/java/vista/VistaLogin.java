@@ -20,6 +20,7 @@ public class VistaLogin extends javax.swing.JFrame {
         setTitle("Inicia Sesion");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
+        this.getRootPane().setDefaultButton(btnlogin);
     }
 
     /**
@@ -34,7 +35,7 @@ public class VistaLogin extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         btnlogin = new javax.swing.JButton();
-        txtusuario = new javax.swing.JTextField();
+        txtusuario1 = new javax.swing.JTextField();
         txtpassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -49,10 +50,9 @@ public class VistaLogin extends javax.swing.JFrame {
                 btnloginActionPerformed(evt);
             }
         });
-
-        txtpassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtpasswordActionPerformed(evt);
+        btnlogin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnloginKeyPressed(evt);
             }
         });
 
@@ -65,24 +65,24 @@ public class VistaLogin extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(77, 77, 77)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2))
-                        .addGap(51, 51, 51)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1))
+                        .addGap(62, 62, 62)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtusuario, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                            .addComponent(txtusuario1, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                             .addComponent(txtpassword)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(151, 151, 151)
                         .addComponent(btnlogin)))
-                .addContainerGap(92, Short.MAX_VALUE))
+                .addContainerGap(81, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(64, 64, 64)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtusuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(jLabel1)
+                    .addComponent(txtusuario1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -96,8 +96,13 @@ public class VistaLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnloginActionPerformed
-        String usuario = txtusuario.getText();
+        String usuario = txtpassword.getText();
         String password = txtpassword.getText();
+        
+        if (usuario.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+            return; // Salir del método si hay campos vacíos
+        }
         
         String usuario1 = "admin";
         String password1 = "admin";
@@ -110,9 +115,9 @@ public class VistaLogin extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnloginActionPerformed
 
-    private void txtpasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpasswordActionPerformed
+    private void btnloginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnloginKeyPressed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtpasswordActionPerformed
+    }//GEN-LAST:event_btnloginKeyPressed
 
     /**
      * @param args the command line arguments
@@ -155,6 +160,6 @@ public class VistaLogin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPasswordField txtpassword;
-    private javax.swing.JTextField txtusuario;
+    private javax.swing.JTextField txtusuario1;
     // End of variables declaration//GEN-END:variables
 }
