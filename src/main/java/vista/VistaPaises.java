@@ -59,6 +59,7 @@ public class VistaPaises extends javax.swing.JFrame {
         jLabel5.setText("Población");
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
+        txtcodigo.setText("Ingresa el codigo");
         txtcodigo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcodigoFocusGained(evt);
@@ -73,7 +74,6 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
-        txtcontinente.setText("Ingrese Un Continente");
         txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcontinenteFocusGained(evt);
@@ -88,7 +88,8 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
-        txtnombre.setText("Ingrese Un Nombre");
+        txtnombre.setForeground(new java.awt.Color(153, 153, 153));
+        txtnombre.setText("Ingresa el nombre");
         txtnombre.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtnombreFocusGained(evt);
@@ -98,7 +99,6 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
-        txtpoblacion.setText("Ingrese Una Poblacion");
         txtpoblacion.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtpoblacionFocusGained(evt);
@@ -150,18 +150,16 @@ public class VistaPaises extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel5))
-                                .addGap(44, 44, 44)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtcontinente)
-                                    .addComponent(txtnombre)
-                                    .addComponent(txtcodigo)
-                                    .addComponent(txtpoblacion))))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel4))
+                        .addGap(38, 38, 38)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtpoblacion)
+                            .addComponent(txtcontinente)
+                            .addComponent(txtnombre, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                            .addComponent(txtcodigo))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnagregar)
@@ -232,8 +230,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
     // TODO add your handling code here:
-        
-        if(!txtcodigo.getText().isEmpty())
+        if(txtcodigo.getText().equals("Ingresa el codigo"))
         {
             txtcodigo.setText("");
             txtcodigo.setForeground(new Color(0,0,0));
@@ -241,12 +238,15 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_txtcodigoFocusGained
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
-        txtcodigo.setText("Ingresa el codigo");
-        txtcodigo.setForeground(new Color(153,153,153));
+        if(txtcodigo.getText().equals("")){
+            txtcodigo.setText("Ingresa el codigo");
+            txtcodigo.setForeground(new Color(153,153,153));
+        }
     }//GEN-LAST:event_txtcodigoFocusLost
 
     private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
-        if(!txtnombre.getText().isEmpty())
+
+        if(txtnombre.getText().equals("Ingresa el nombre"))
         {
             txtnombre.setText("");
             txtnombre.setForeground(new Color(0,0,0));
@@ -255,8 +255,10 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
         // TODO add your handling code here:
-        txtnombre.setText("Ingresa el nombre");
-        txtnombre.setForeground(new Color(153,153,153));
+        if(txtnombre.getText().equals("")){
+            txtnombre.setText("Ingresa el nombre");
+            txtnombre.setForeground(new Color(153,153,153));
+        }
     }//GEN-LAST:event_txtnombreFocusLost
 
     private void txtcontinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcontinenteActionPerformed
