@@ -4,12 +4,15 @@
  */
 package vista;
 
+import javax.swing.table.DefaultTableModel;
+
+
 /**
  *
  * @author Mouli
  */
 public class VistaPaises extends javax.swing.JFrame {
-
+    
     /**
      * Creates new form VistaPaises
      */
@@ -55,10 +58,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Codigo", "Nombre", "Continente", "Poblacion"
@@ -67,6 +67,11 @@ public class VistaPaises extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTable1);
 
         btnagregar.setText("Agregar");
+        btnagregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnagregarActionPerformed(evt);
+            }
+        });
 
         btnconsultar.setText("Consultar");
 
@@ -142,6 +147,26 @@ public class VistaPaises extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
+    DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+
+    // 2. Creamos un array (una fila) con los datos de los campos de texto.
+    Object[] fila = new Object[4];
+    fila[0] = txtcodigo.getText();
+    fila[1] = txtnombre.getText();
+    fila[2] = txtcontinente.getText();
+    fila[3] = txtpoblacion.getText();
+
+    // 3. Agregamos la fila al modelo.
+    modelo.addRow(fila);
+
+    // 4. (Opcional) Limpiamos los campos de texto para el siguiente registro.
+    txtcodigo.setText("");
+    txtnombre.setText("");
+    txtcontinente.setText("");
+    txtpoblacion.setText("");        // TODO add your handling code here:
+    }//GEN-LAST:event_btnagregarActionPerformed
 
     /**
      * @param args the command line arguments
