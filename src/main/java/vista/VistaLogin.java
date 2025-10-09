@@ -51,8 +51,6 @@ public class VistaLogin extends javax.swing.JFrame {
             }
         });
 
-        txtusuario.setText("admin");
-
         txtpassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtpasswordActionPerformed(evt);

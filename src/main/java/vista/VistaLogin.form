@@ -86,9 +86,6 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="txtusuario">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="admin"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JPasswordField" name="txtpassword">
       <Events>
