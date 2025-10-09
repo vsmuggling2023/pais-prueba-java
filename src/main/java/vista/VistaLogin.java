@@ -20,6 +20,7 @@ public class VistaLogin extends javax.swing.JFrame {
         setTitle("Inicia Sesion");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
+        this.getRootPane().setDefaultButton(btnlogin);
     }
 
     /**

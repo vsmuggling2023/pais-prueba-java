@@ -4,6 +4,7 @@
  */
 package vista;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -18,6 +19,7 @@ public class VistaPaises extends javax.swing.JFrame {
      */
     public VistaPaises() {
         initComponents();
+        this.getRootPane().setDefaultButton(btnagregar);
     }
 
     /**
@@ -151,17 +153,27 @@ public class VistaPaises extends javax.swing.JFrame {
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
     DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
-    // 2. Creamos un array (una fila) con los datos de los campos de texto.
+
     Object[] fila = new Object[4];
     fila[0] = txtcodigo.getText();
     fila[1] = txtnombre.getText();
     fila[2] = txtcontinente.getText();
     fila[3] = txtpoblacion.getText();
+    String codigo = txtcodigo.getText();
+    String nombre = txtnombre.getText();
+    String continente = txtcontinente.getText();
+    String poblacion = txtpoblacion.getText();
+    
+    if (codigo.isEmpty() || nombre.isEmpty() || continente.isEmpty() || poblacion.isEmpty()) {
+    JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos", "Campos incompletos", JOptionPane.WARNING_MESSAGE);
+        
+    } else {
+        }
 
-    // 3. Agregamos la fila al modelo.
+
     modelo.addRow(fila);
 
-    // 4. (Opcional) Limpiamos los campos de texto para el siguiente registro.
+
     txtcodigo.setText("");
     txtnombre.setText("");
     txtcontinente.setText("");
