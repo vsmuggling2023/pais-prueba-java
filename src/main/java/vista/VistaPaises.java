@@ -20,6 +20,9 @@ public class VistaPaises extends javax.swing.JFrame {
      */
     public VistaPaises() {
         initComponents();
+        setTitle("Lista de Paises");
+        this.setLocationRelativeTo(null);
+        this.setResizable(false);
     }
 
     /**
@@ -74,6 +77,8 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
+        txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
+        txtcontinente.setText("Ingresa el continente");
         txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcontinenteFocusGained(evt);
@@ -99,6 +104,8 @@ public class VistaPaises extends javax.swing.JFrame {
             }
         });
 
+        txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
+        txtpoblacion.setText("Ingresa la población");
         txtpoblacion.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtpoblacionFocusGained(evt);
@@ -157,8 +164,8 @@ public class VistaPaises extends javax.swing.JFrame {
                         .addGap(38, 38, 38)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtpoblacion)
-                            .addComponent(txtcontinente)
-                            .addComponent(txtnombre, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                            .addComponent(txtcontinente, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                            .addComponent(txtnombre)
                             .addComponent(txtcodigo))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
@@ -267,7 +274,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
         // TODO add your handling code here:
-        if(!txtcontinente.getText().isEmpty())
+        if(txtcontinente.getText().equals("Ingresa el continente"))
         {
             txtcontinente.setText("");
             txtcontinente.setForeground(new Color(0,0,0));
@@ -275,14 +282,16 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_txtcontinenteFocusGained
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
-        txtcontinente.setText("Ingresa el continente");
-        txtcontinente.setForeground(new Color(153,153,153));
+        if(txtcontinente.getText().equals("")){
+            txtcontinente.setText("Ingresa el continente");
+            txtcontinente.setForeground(new Color(153,153,153));
+        }
         
     }//GEN-LAST:event_txtcontinenteFocusLost
 
     private void txtpoblacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusGained
         // TODO add your handling code here:
-        if(!txtpoblacion.getText().isEmpty())
+        if(txtpoblacion.getText().equals("Ingresa la población"))
         {
             txtpoblacion.setText("");
             txtpoblacion.setForeground(new Color(0,0,0));
@@ -290,8 +299,10 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_txtpoblacionFocusGained
 
     private void txtpoblacionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusLost
-        txtpoblacion.setText("Ingresa la población");
-        txtpoblacion.setForeground(new Color(153,153,153));
+        if(txtpoblacion.getText().equals("")){
+            txtpoblacion.setText("Ingresa la población");
+            txtpoblacion.setForeground(new Color(153,153,153));
+        }
     }//GEN-LAST:event_txtpoblacionFocusLost
 
     /**
