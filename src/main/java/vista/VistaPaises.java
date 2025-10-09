@@ -59,7 +59,6 @@ public class VistaPaises extends javax.swing.JFrame {
         jLabel5.setText("Población");
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
-        txtcodigo.setText("Ingrese Un Codigo");
         txtcodigo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcodigoFocusGained(evt);
@@ -219,15 +218,7 @@ public class VistaPaises extends javax.swing.JFrame {
         fila[2] = txtcontinente.getText();
         fila[3] = txtpoblacion.getText();
         
-        if (jTable1.getModel().getRowCount() == 0) {
-           
-            JOptionPane.showMessageDialog(
-                null,
-                "La tabla está vacía. Ingrese al menos un registro.",
-                "Faltan Datos en la Tabla",
-                JOptionPane.INFORMATION_MESSAGE
-            );
-        }
+        
         // 3. Agregamos la fila al modelo.
         modelo.addRow(fila);
 
@@ -241,7 +232,8 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
     // TODO add your handling code here:
-            if(txtcodigo.getText().equals("Ingrese Un Codigo"))
+        
+        if(!txtcodigo.getText().isEmpty())
         {
             txtcodigo.setText("");
             txtcodigo.setForeground(new Color(0,0,0));
@@ -249,17 +241,12 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_txtcodigoFocusGained
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
-        // TODO add your handling code here:
-        if(txtcodigo.getText().equals("")){
-            txtcodigo.setText("Ingrese un codigo");
-            txtcodigo.setForeground(new Color(153,153,153));
-        }
-       
+        txtcodigo.setText("Ingresa el codigo");
+        txtcodigo.setForeground(new Color(153,153,153));
     }//GEN-LAST:event_txtcodigoFocusLost
 
     private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
-        // TODO add your handling code here:
-                if(txtnombre.getText().equals("Ingrese Un Nombre"))
+        if(!txtnombre.getText().isEmpty())
         {
             txtnombre.setText("");
             txtnombre.setForeground(new Color(0,0,0));
@@ -268,7 +255,8 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
         // TODO add your handling code here:
-       
+        txtnombre.setText("Ingresa el nombre");
+        txtnombre.setForeground(new Color(153,153,153));
     }//GEN-LAST:event_txtnombreFocusLost
 
     private void txtcontinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcontinenteActionPerformed
@@ -277,7 +265,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
         // TODO add your handling code here:
-                if(txtcontinente.getText().equals("Ingrese Un Continente"))
+        if(!txtcontinente.getText().isEmpty())
         {
             txtcontinente.setText("");
             txtcontinente.setForeground(new Color(0,0,0));
@@ -285,13 +273,14 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_txtcontinenteFocusGained
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
-        // TODO add your handling code here:
+        txtcontinente.setText("Ingresa el continente");
+        txtcontinente.setForeground(new Color(153,153,153));
         
     }//GEN-LAST:event_txtcontinenteFocusLost
 
     private void txtpoblacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusGained
         // TODO add your handling code here:
-                if(txtpoblacion.getText().equals("Ingrese Una Poblacion"))
+        if(!txtpoblacion.getText().isEmpty())
         {
             txtpoblacion.setText("");
             txtpoblacion.setForeground(new Color(0,0,0));
@@ -299,8 +288,8 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_txtpoblacionFocusGained
 
     private void txtpoblacionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusLost
-        // TODO add your handling code here:
-        
+        txtpoblacion.setText("Ingresa la población");
+        txtpoblacion.setForeground(new Color(153,153,153));
     }//GEN-LAST:event_txtpoblacionFocusLost
 
     /**
