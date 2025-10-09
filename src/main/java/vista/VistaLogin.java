@@ -51,6 +51,14 @@ public class VistaLogin extends javax.swing.JFrame {
             }
         });
 
+        txtusuario.setText("admin");
+
+        txtpassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtpasswordActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -104,6 +112,10 @@ public class VistaLogin extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Revisa tus credenciales!", "Error de contraseña", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnloginActionPerformed
+
+    private void txtpasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpasswordActionPerformed
 
     /**
      * @param args the command line arguments

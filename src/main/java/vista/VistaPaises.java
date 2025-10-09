@@ -4,7 +4,7 @@
  */
 package vista;
 
-import javax.swing.JOptionPane;
+import java.awt.Color;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -19,7 +19,6 @@ public class VistaPaises extends javax.swing.JFrame {
      */
     public VistaPaises() {
         initComponents();
-        this.getRootPane().setDefaultButton(btnagregar);
     }
 
     /**
@@ -57,6 +56,60 @@ public class VistaPaises extends javax.swing.JFrame {
         jLabel4.setText("Continente");
 
         jLabel5.setText("Población");
+
+        txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
+        txtcodigo.setText("Ingrese Un Codigo");
+        txtcodigo.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtcodigoFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtcodigoFocusLost(evt);
+            }
+        });
+        txtcodigo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtcodigoActionPerformed(evt);
+            }
+        });
+
+        txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
+        txtcontinente.setText("Ingrese Un Continente");
+        txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtcontinenteFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtcontinenteFocusLost(evt);
+            }
+        });
+        txtcontinente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtcontinenteActionPerformed(evt);
+            }
+        });
+
+        txtnombre.setForeground(new java.awt.Color(153, 153, 153));
+        txtnombre.setText("Ingrese Un Nombre");
+        txtnombre.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtnombreFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtnombreFocusLost(evt);
+            }
+        });
+
+        txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
+        txtpoblacion.setText("Ingrese Una Poblacion");
+        txtpoblacion.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtpoblacionFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtpoblacionFocusLost(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -100,10 +153,10 @@ public class VistaPaises extends javax.swing.JFrame {
                                     .addComponent(jLabel5))
                                 .addGap(44, 44, 44)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtcodigo)
-                                    .addComponent(txtnombre)
                                     .addComponent(txtcontinente)
-                                    .addComponent(txtpoblacion, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))))
+                                    .addComponent(txtnombre)
+                                    .addComponent(txtcodigo)
+                                    .addComponent(txtpoblacion))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnagregar)
@@ -153,32 +206,99 @@ public class VistaPaises extends javax.swing.JFrame {
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
     DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
-
+    // 2. Creamos un array (una fila) con los datos de los campos de texto.
     Object[] fila = new Object[4];
     fila[0] = txtcodigo.getText();
     fila[1] = txtnombre.getText();
     fila[2] = txtcontinente.getText();
     fila[3] = txtpoblacion.getText();
-    String codigo = txtcodigo.getText();
-    String nombre = txtnombre.getText();
-    String continente = txtcontinente.getText();
-    String poblacion = txtpoblacion.getText();
-    
-    if (codigo.isEmpty() || nombre.isEmpty() || continente.isEmpty() || poblacion.isEmpty()) {
-    JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos", "Campos incompletos", JOptionPane.WARNING_MESSAGE);
-        
-    } else {
-        }
 
-
+    // 3. Agregamos la fila al modelo.
     modelo.addRow(fila);
 
-
-    txtcodigo.setText("");
-    txtnombre.setText("");
-    txtcontinente.setText("");
-    txtpoblacion.setText("");        // TODO add your handling code here:
+   
     }//GEN-LAST:event_btnagregarActionPerformed
+
+    private void txtcodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigoActionPerformed
+        // TODO add your handling code here:
+    
+    }//GEN-LAST:event_txtcodigoActionPerformed
+
+    private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
+    // TODO add your handling code here:
+            if(txtcodigo.getText().equals("Ingrese Un Codigo"))
+        {
+            txtcodigo.setText("");
+            txtcodigo.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtcodigoFocusGained
+
+    private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
+        // TODO add your handling code here:
+                if(txtcodigo.getText().equals(""))
+        {
+            txtcodigo.setText("Ingrese Un Codigo");
+            txtcodigo.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtcodigoFocusLost
+
+    private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
+        // TODO add your handling code here:
+                if(txtnombre.getText().equals("Ingrese Un Nombre"))
+        {
+            txtnombre.setText("");
+            txtnombre.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtnombreFocusGained
+
+    private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
+        // TODO add your handling code here:
+                if(txtnombre.getText().equals(""))
+        {
+            txtnombre.setText("Ingrese Un Nombre");
+            txtnombre.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtnombreFocusLost
+
+    private void txtcontinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcontinenteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtcontinenteActionPerformed
+
+    private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
+        // TODO add your handling code here:
+                if(txtcontinente.getText().equals("Ingrese Un Continente"))
+        {
+            txtcontinente.setText("");
+            txtcontinente.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtcontinenteFocusGained
+
+    private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
+        // TODO add your handling code here:
+                if(txtcontinente.getText().equals(""))
+        {
+            txtcontinente.setText("Ingrese Un Continente");
+            txtcontinente.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtcontinenteFocusLost
+
+    private void txtpoblacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusGained
+        // TODO add your handling code here:
+                if(txtpoblacion.getText().equals("Ingrese Una Poblacion"))
+        {
+            txtpoblacion.setText("");
+            txtpoblacion.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtpoblacionFocusGained
+
+    private void txtpoblacionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusLost
+        // TODO add your handling code here:
+                if(txtpoblacion.getText().equals(""))
+        {
+            txtpoblacion.setText("Ingrese Una Poblacion");
+            txtpoblacion.setForeground(new Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtpoblacionFocusLost
 
     /**
      * @param args the command line arguments
@@ -200,4 +320,29 @@ public class VistaPaises extends javax.swing.JFrame {
     private javax.swing.JTextField txtnombre;
     private javax.swing.JTextField txtpoblacion;
     // End of variables declaration//GEN-END:variables
+
+private void setPlaceholder(javax.swing.JTextField textField, String placeholder) {
+        textField.setText(placeholder);
+        textField.setForeground(new java.awt.Color(153, 153, 153)); // Un gris un poco más oscuro
+
+        textField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (textField.getText().equals(placeholder)) {
+                    textField.setText("");
+                    textField.setForeground(java.awt.Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (textField.getText().isEmpty()) {
+                    textField.setText(placeholder);
+                    textField.setForeground(new java.awt.Color(153, 153, 153));
+                }
+            }
+        });
+    }
+
+
 }
