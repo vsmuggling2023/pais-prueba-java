@@ -263,6 +263,9 @@ public class VistaLogin extends javax.swing.JFrame {
         String password1 = "admin";
         if(usuario.equals(usuario1) && password.equals(password1)){
             VistaPaises vista  = new VistaPaises();
+            if (clipMusica != null && clipMusica.isRunning()) {
+            clipMusica.stop(); 
+        }
             vista.setVisible(true);
             this.dispose();
         } else {
