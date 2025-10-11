@@ -4,25 +4,64 @@
  */
 package vista;
 
+import java.awt.Color;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 /**
  *
- * @author Santo Tomas
+ * @author Fram
  */
-public class VistaLogin extends javax.swing.JFrame {
 
+public class VistaLogin extends javax.swing.JFrame {
+    public void playSound(String Click) {
+    try {
+        
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(
+            getClass().getResource("/sounds/" + Click)
+        );
+
+        
+        Clip soundClip = AudioSystem.getClip();
+        soundClip.open(audioStream);
+
+        
+        soundClip.start(); 
+
+    } catch (Exception ex) {
+        System.out.println("Error al reproducir el sonido: " + ex.getMessage());
+    }
+}
     /**
      * Creates new form VistaLogin
      */
+    private Clip clipMusica;
+    private boolean musicaSonando = false;
+    private void cargarMusicaDeFondo() {
+    try {
+        // Busca el archivo en la carpeta de recursos
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(
+            getClass().getResource("/sounds/fondo.wav") // <-- ¡CAMBIA ESTO por el nombre de tu archivo!
+        );
+        clipMusica = AudioSystem.getClip();
+        clipMusica.open(audioStream);
+    } catch (Exception ex) {
+        System.out.println("Error al cargar la música de fondo: " + ex.getMessage());
+    }
+}
+    int xMouse, yMouse;
     public VistaLogin() {
         initComponents();
+        cargarMusicaDeFondo();
         setTitle("Inicia Sesion");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.setSize(400, 300);
+        this.setSize(1020, 600);
         this.getRootPane().setDefaultButton(btnlogin);
-        this.getContentPane().setBackground(new java.awt.Color(230, 230, 250));
+        
     }
 
     /**
@@ -34,20 +73,53 @@ public class VistaLogin extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jSeparator2 = new javax.swing.JSeparator();
+        jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         btnlogin = new javax.swing.JButton();
         txtusuario1 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         txtpassword = new javax.swing.JPasswordField();
+        jPanel1 = new javax.swing.JPanel();
+        minBtn = new javax.swing.JButton();
+        extBtn = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jSeparator2.setBackground(new java.awt.Color(204, 204, 255));
+        jSeparator2.setForeground(new java.awt.Color(204, 204, 255));
+        getContentPane().add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 1020, 20));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Papulandia.png"))); // NOI18N
+        jLabel6.setText("jLabel6");
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 500, 100, 110));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setText("Usuario");
+        jLabel1.setToolTipText("");
+        jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jLabel1.setName(""); // NOI18N
+        jLabel1.setNextFocusableComponent(jLabel2);
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 200, 110, 30));
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("Contraseña");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, 100, 30));
 
-        btnlogin.setText("Acceder");
+        btnlogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton acceder (2).png"))); // NOI18N
+        btnlogin.setBorder(null);
+        btnlogin.setBorderPainted(false);
+        btnlogin.setContentAreaFilled(false);
+        btnlogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnlogin.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnlogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnloginActionPerformed(evt);
@@ -58,55 +130,127 @@ public class VistaLogin extends javax.swing.JFrame {
                 btnloginKeyPressed(evt);
             }
         });
+        getContentPane().add(btnlogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 410, 410, 50));
 
-        jLabel3.setIcon(new javax.swing.ImageIcon("C:\\Users\\Santo Tomas\\Downloads\\login (1).png")); // NOI18N
+        txtusuario1.setForeground(new java.awt.Color(204, 204, 204));
+        txtusuario1.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        txtusuario1.setText("Ingrese su nombre de usuario");
+        txtusuario1.setActionCommand("<Not Set>");
+        txtusuario1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtusuario1MousePressed(evt);
+            }
+        });
+        getContentPane().add(txtusuario1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 230, 240, 40));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(97, 97, 97)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtusuario1, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                    .addComponent(txtpassword))
-                .addGap(87, 87, 87))
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(141, 141, 141)
-                        .addComponent(jLabel3))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(148, 148, 148)
-                        .addComponent(btnlogin, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sonido.png"))); // NOI18N
+        jButton1.setBorder(null);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 530, 70, 70));
+
+        txtpassword.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        txtpassword.setText("********");
+        txtpassword.setToolTipText("");
+        txtpassword.setActionCommand("");
+        txtpassword.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtpasswordMousePressed(evt);
+            }
+        });
+        getContentPane().add(txtpassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 330, 240, 40));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPanel1MouseDragged(evt);
+            }
+        });
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPanel1MousePressed(evt);
+            }
+        });
+
+        minBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton minizar.png"))); // NOI18N
+        minBtn.setAutoscrolls(true);
+        minBtn.setBorder(null);
+        minBtn.setContentAreaFilled(false);
+        minBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        minBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minBtnActionPerformed(evt);
+            }
+        });
+
+        extBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton saliirrr (2).png"))); // NOI18N
+        extBtn.setActionCommand("");
+        extBtn.setAutoscrolls(true);
+        extBtn.setBorder(null);
+        extBtn.setContentAreaFilled(false);
+        extBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        extBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                extBtnActionPerformed(evt);
+            }
+        });
+        extBtn.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                extBtnKeyPressed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(939, Short.MAX_VALUE)
+                .addComponent(minBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(extBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(extBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(minBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtusuario1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtpassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addComponent(btnlogin)
-                .addGap(74, 74, 74))
-        );
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 30));
+
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FOndooo.png"))); // NOI18N
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 0, 630, 660));
+
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/login.png"))); // NOI18N
+        jLabel5.setLabelFor(jLabel4);
+        jLabel5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel5.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        jLabel5.setNextFocusableComponent(jLabel4);
+        jLabel5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 410, 160));
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/fondo 2.png"))); // NOI18N
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -70, 410, 670));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+      
     private void btnloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnloginActionPerformed
+        playSound("Click.wav");
+        
         String usuario = txtpassword.getText();
         String password = txtpassword.getText();
         
@@ -129,6 +273,72 @@ public class VistaLogin extends javax.swing.JFrame {
     private void btnloginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnloginKeyPressed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnloginKeyPressed
+
+    private void extBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extBtnActionPerformed
+        System.exit(0);// TODO add your handling code here:
+    }//GEN-LAST:event_extBtnActionPerformed
+
+    private void extBtnKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_extBtnKeyPressed
+     // TODO add your handling code here:
+    }//GEN-LAST:event_extBtnKeyPressed
+
+    private void minBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minBtnActionPerformed
+        this.setExtendedState(JFrame.ICONIFIED);            // TODO add your handling code here:
+    }//GEN-LAST:event_minBtnActionPerformed
+
+    private void txtusuario1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtusuario1MousePressed
+        if (txtusuario1.getText().equals("Ingrese su nombre de usuario")){
+            txtusuario1.setText("");
+            txtusuario1.setForeground(Color.black);  
+        }
+        if (String.valueOf(txtpassword.getPassword()).isEmpty()){
+            txtpassword.setText("********");
+            txtpassword.setForeground(Color.GRAY);
+        }
+    }//GEN-LAST:event_txtusuario1MousePressed
+
+    private void txtpasswordMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtpasswordMousePressed
+        if (String.valueOf(txtpassword.getPassword()).equals("********")){
+            txtpassword.setText("");
+            txtpassword.setForeground(Color.BLACK);
+           }     
+        if (txtusuario1.getText().isEmpty()){
+            txtusuario1.setText("Ingrese su nombre de usuario");
+            txtusuario1.setForeground(Color.gray); 
+            }  
+    }//GEN-LAST:event_txtpasswordMousePressed
+
+    private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
+        xMouse = evt.getX();
+        yMouse = evt.getY();
+    }//GEN-LAST:event_jPanel1MousePressed
+
+    private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - xMouse,y - yMouse);        // TODO add your handling code here:
+    }//GEN-LAST:event_jPanel1MouseDragged
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+     if (clipMusica != null) {
+        // Si la música está sonando...
+        if (musicaSonando) {
+            // ... la detenemos.
+            clipMusica.stop();
+            // Opcional: Cambia el texto del botón para que el usuario sepa
+            // btnMusica.setText("Activar Música");
+        } else {
+            // Si no está sonando...
+            // ... la iniciamos para que se repita continuamente.
+            clipMusica.loop(Clip.LOOP_CONTINUOUSLY);
+            // Opcional: Cambia el texto del botón
+            // btnMusica.setText("Desactivar Música");
+        }
+        // Invertimos el estado
+        musicaSonando = !musicaSonando;
+    }
+   // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -168,9 +378,17 @@ public class VistaLogin extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnlogin;
+    private javax.swing.JButton extBtn;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JButton minBtn;
     private javax.swing.JPasswordField txtpassword;
     private javax.swing.JTextField txtusuario1;
     // End of variables declaration//GEN-END:variables

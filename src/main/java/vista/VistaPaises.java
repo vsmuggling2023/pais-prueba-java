@@ -23,6 +23,7 @@ public class VistaPaises extends javax.swing.JFrame {
         setTitle("Lista de Paises");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
+        this.getRootPane().setDefaultButton(btnagregar);
     }
 
     /**
