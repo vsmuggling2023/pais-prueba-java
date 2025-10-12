@@ -108,11 +108,11 @@ public class VistaLogin extends javax.swing.JFrame {
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jLabel1.setName(""); // NOI18N
         jLabel1.setNextFocusableComponent(jLabel2);
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 200, 110, 30));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 200, 110, 30));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("Contraseña");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 300, 100, 30));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, 100, 30));
 
         btnlogin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton acceder (2).png"))); // NOI18N
         btnlogin.setBorder(null);
@@ -130,7 +130,7 @@ public class VistaLogin extends javax.swing.JFrame {
                 btnloginKeyPressed(evt);
             }
         });
-        getContentPane().add(btnlogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 410, 410, 50));
+        getContentPane().add(btnlogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 410, 390, 50));
 
         txtusuario1.setForeground(new java.awt.Color(204, 204, 204));
         txtusuario1.setHorizontalAlignment(javax.swing.JTextField.LEFT);
@@ -141,7 +141,7 @@ public class VistaLogin extends javax.swing.JFrame {
                 txtusuario1MousePressed(evt);
             }
         });
-        getContentPane().add(txtusuario1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 230, 240, 40));
+        getContentPane().add(txtusuario1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 230, 240, 40));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sonido.png"))); // NOI18N
         jButton1.setBorder(null);
@@ -164,7 +164,7 @@ public class VistaLogin extends javax.swing.JFrame {
                 txtpasswordMousePressed(evt);
             }
         });
-        getContentPane().add(txtpassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 330, 240, 40));
+        getContentPane().add(txtpassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 330, 240, 40));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -191,7 +191,6 @@ public class VistaLogin extends javax.swing.JFrame {
         });
 
         extBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton saliirrr (2).png"))); // NOI18N
-        extBtn.setActionCommand("");
         extBtn.setAutoscrolls(true);
         extBtn.setBorder(null);
         extBtn.setContentAreaFilled(false);
@@ -231,7 +230,7 @@ public class VistaLogin extends javax.swing.JFrame {
 
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FOndooo.png"))); // NOI18N
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 0, 630, 660));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 0, 660, 660));
 
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/login.png"))); // NOI18N
@@ -240,10 +239,10 @@ public class VistaLogin extends javax.swing.JFrame {
         jLabel5.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         jLabel5.setNextFocusableComponent(jLabel4);
         jLabel5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 410, 160));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 380, 160));
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/fondo 2.png"))); // NOI18N
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -70, 410, 670));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -70, 380, 670));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

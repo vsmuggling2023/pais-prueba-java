@@ -23,6 +23,7 @@ public class VistaPaises extends javax.swing.JFrame {
         setTitle("Lista de Paises");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
+        this.setSize(1020, 600);
         this.getRootPane().setDefaultButton(btnagregar);
     }
 
@@ -49,18 +50,25 @@ public class VistaPaises extends javax.swing.JFrame {
         btnagregar = new javax.swing.JButton();
         btnconsultar = new javax.swing.JButton();
         btnmodificar = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setText("Lista de Paises");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 26, -1, -1));
 
         jLabel2.setText("Codigo");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 172, -1, -1));
 
         jLabel3.setText("Nombre");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 230, -1, -1));
 
         jLabel4.setText("Continente");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 298, -1, -1));
 
         jLabel5.setText("Población");
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 370, -1, -1));
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
         txtcodigo.setText("Ingresa el codigo");
@@ -77,6 +85,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcodigoActionPerformed(evt);
             }
         });
+        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 298, 131, -1));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
         txtcontinente.setText("Ingresa el continente");
@@ -93,6 +102,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcontinenteActionPerformed(evt);
             }
         });
+        getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 227, 131, -1));
 
         txtnombre.setForeground(new java.awt.Color(153, 153, 153));
         txtnombre.setText("Ingresa el nombre");
@@ -104,6 +114,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtnombreFocusLost(evt);
             }
         });
+        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 169, 131, -1));
 
         txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
         txtpoblacion.setText("Ingresa la población");
@@ -115,6 +126,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtpoblacionFocusLost(evt);
             }
         });
+        getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 367, 131, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -134,82 +146,25 @@ public class VistaPaises extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTable1);
 
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(456, 69, 545, 399));
+
         btnagregar.setText("Agregar");
         btnagregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnagregarActionPerformed(evt);
             }
         });
+        getContentPane().add(btnagregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 485, -1, -1));
 
         btnconsultar.setText("Consultar");
+        getContentPane().add(btnconsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 485, -1, -1));
 
         btnmodificar.setText("Modificar");
+        getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(309, 485, -1, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(265, 265, 265)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(33, 33, 33)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel4))
-                        .addGap(38, 38, 38)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtpoblacion)
-                            .addComponent(txtcontinente, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
-                            .addComponent(txtnombre)
-                            .addComponent(txtcodigo))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnagregar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnconsultar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnmodificar)
-                        .addGap(31, 31, 31)))
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(59, 59, 59))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(txtcodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtnombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(txtcontinente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(txtpoblacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(32, 32, 32)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnagregar)
-                            .addComponent(btnconsultar)
-                            .addComponent(btnmodificar))))
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FONDO PAIS.png"))); // NOI18N
+        jLabel6.setText("jLabel6");
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(-70, -40, 520, 680));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -319,6 +274,7 @@ public class VistaPaises extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField txtcodigo;
