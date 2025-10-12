@@ -329,11 +329,10 @@ public class VistaPaises extends javax.swing.JFrame {
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 530, 70, 70));
 
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/maybe fondo.png"))); // NOI18N
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/maybe_fondo.png"))); // NOI18N
         jLabel6.setText("jLabel6");
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 380, 560));
 
-        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Papulandia.png"))); // NOI18N
         jLabel8.setText("jLabel6");
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 500, 100, 110));
 
