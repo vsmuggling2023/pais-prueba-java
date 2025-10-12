@@ -5,6 +5,7 @@
 package vista;
 
 import java.awt.Color;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,6 +19,7 @@ public class VistaPaises extends javax.swing.JFrame {
     /**
      * Creates new form VistaPaises
      */
+    int xMouse, yMouse;
     public VistaPaises() {
         initComponents();
         setTitle("Lista de Paises");
@@ -36,6 +38,9 @@ public class VistaPaises extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        minBtn = new javax.swing.JButton();
+        extBtn = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -53,10 +58,74 @@ public class VistaPaises extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPanel1MouseDragged(evt);
+            }
+        });
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPanel1MousePressed(evt);
+            }
+        });
+
+        minBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton minizar.png"))); // NOI18N
+        minBtn.setAutoscrolls(true);
+        minBtn.setBorder(null);
+        minBtn.setContentAreaFilled(false);
+        minBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        minBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minBtnActionPerformed(evt);
+            }
+        });
+
+        extBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton saliirrr (2).png"))); // NOI18N
+        extBtn.setAutoscrolls(true);
+        extBtn.setBorder(null);
+        extBtn.setContentAreaFilled(false);
+        extBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        extBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                extBtnActionPerformed(evt);
+            }
+        });
+        extBtn.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                extBtnKeyPressed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(933, Short.MAX_VALUE)
+                .addComponent(minBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(extBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(extBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(minBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 40));
+
         jLabel1.setText("Lista de Paises");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 26, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, -1, -1));
 
         jLabel2.setText("Codigo");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 172, -1, -1));
@@ -261,6 +330,29 @@ public class VistaPaises extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtpoblacionFocusLost
 
+    private void minBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minBtnActionPerformed
+        this.setExtendedState(JFrame.ICONIFIED);            // TODO add your handling code here:
+    }//GEN-LAST:event_minBtnActionPerformed
+
+    private void extBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extBtnActionPerformed
+        System.exit(0);// TODO add your handling code here:
+    }//GEN-LAST:event_extBtnActionPerformed
+
+    private void extBtnKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_extBtnKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_extBtnKeyPressed
+
+    private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
+        int x = evt.getXOnScreen();
+        int y = evt.getYOnScreen();
+        this.setLocation(x - xMouse,y - yMouse);        // TODO add your handling code here:
+    }//GEN-LAST:event_jPanel1MouseDragged
+
+    private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
+        xMouse = evt.getX();
+        yMouse = evt.getY();
+    }//GEN-LAST:event_jPanel1MousePressed
+
     /**
      * @param args the command line arguments
      */
@@ -269,14 +361,17 @@ public class VistaPaises extends javax.swing.JFrame {
     private javax.swing.JButton btnagregar;
     private javax.swing.JButton btnconsultar;
     private javax.swing.JButton btnmodificar;
+    private javax.swing.JButton extBtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JButton minBtn;
     private javax.swing.JTextField txtcodigo;
     private javax.swing.JTextField txtcontinente;
     private javax.swing.JTextField txtnombre;
