@@ -5,9 +5,15 @@
 package vista;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 
 /**
@@ -27,8 +33,78 @@ public class VistaPaises extends javax.swing.JFrame {
         this.setResizable(false);
         this.setSize(1020, 600);
         this.getRootPane().setDefaultButton(btnagregar);
+        cargarMusicaDeFondo();
+        personalizarTablaEstiloFrutiger(); 
+        
     }
 
+    private void personalizarTablaEstiloFrutiger() {
+        
+        // --- 1. Personalizar el Encabezado (Header) ---
+        JTableHeader header = jTable1.getTableHeader();
+        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        header.setOpaque(false);
+        // Un azul brillante y fresco, muy característico del estilo
+        header.setBackground(new Color(0, 176, 240)); 
+        header.setForeground(Color.WHITE);
+
+        // --- 2. Personalizar las Celdas con Colores Frutiger Aero ---
+        jTable1.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(javax.swing.JTable table, Object value,
+                                                             boolean isSelected, boolean hasFocus, int row, int column) {
+                
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                // Fila par: un blanco casi puro para dar luminosidad
+                if (row % 2 == 0) {
+                    c.setBackground(new Color(245, 255, 255)); // Un blanco ligeramente azulado
+                    c.setForeground(Color.DARK_GRAY);
+                } else {
+                    
+                    c.setBackground(new Color(220, 245, 255)); 
+                    c.setForeground(Color.DARK_GRAY);
+                }
+
+                
+                if (isSelected) {
+                    c.setBackground(new Color(50, 150, 255));
+                    c.setForeground(Color.WHITE);
+                }
+                
+                return c;
+            }
+        });
+
+    // --- 3. Otros Ajustes Visuales ---
+    jTable1.setRowHeight(28);
+    jTable1.setGridColor(new Color(210, 235, 255));
+    jTable1.setShowGrid(true);
+
+    // --- 4. HACER TRANSPARENTE EL SCROLLPANE Y LA TABLA --- ¡ESTA ES LA CLAVE!
+    
+    // Hacemos que el JScrollPane no pinte su fondo
+    jScrollPane1.setOpaque(false);
+    jScrollPane1.getViewport().setOpaque(false);
+    
+    // Hacemos que la JTable no pinte su fondo
+    jTable1.setOpaque(true);
+    //jTable1.setBackground(new Color(0,0,0,0)); // Alternativa para hacerla completamente transparente
+}
+    private Clip clipMusica;
+    private boolean musicaSonando = false;
+    private void cargarMusicaDeFondo() {
+    try {
+        // Busca el archivo en la carpeta de recursos
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(
+            getClass().getResource("/sounds/fondo.wav") // <-- ¡CAMBIA ESTO por el nombre de tu archivo!
+        );
+        clipMusica = AudioSystem.getClip();
+        clipMusica.open(audioStream);
+    } catch (Exception ex) {
+        System.out.println("Error al cargar la música de fondo: " + ex.getMessage());
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -38,9 +114,9 @@ public class VistaPaises extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
         minBtn = new javax.swing.JButton();
         extBtn = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -55,25 +131,14 @@ public class VistaPaises extends javax.swing.JFrame {
         btnagregar = new javax.swing.JButton();
         btnconsultar = new javax.swing.JButton();
         btnmodificar = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
-        jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jPanel1MouseDragged(evt);
-            }
-        });
-        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jPanel1MousePressed(evt);
-            }
-        });
 
         minBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton minizar.png"))); // NOI18N
         minBtn.setAutoscrolls(true);
@@ -85,6 +150,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 minBtnActionPerformed(evt);
             }
         });
+        getContentPane().add(minBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 0, 40, 40));
 
         extBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton saliirrr (2).png"))); // NOI18N
         extBtn.setAutoscrolls(true);
@@ -101,46 +167,52 @@ public class VistaPaises extends javax.swing.JFrame {
                 extBtnKeyPressed(evt);
             }
         });
+        getContentPane().add(extBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 0, -1, -1));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPanel1MouseDragged(evt);
+            }
+        });
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPanel1MousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(933, Short.MAX_VALUE)
-                .addComponent(minBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(extBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5))
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(extBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(minBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 40));
 
         jLabel1.setText("Lista de Paises");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 90, -1, -1));
 
         jLabel2.setText("Codigo");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 172, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 170, -1, -1));
 
         jLabel3.setText("Nombre");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 230, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 230, -1, -1));
 
         jLabel4.setText("Continente");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 298, -1, -1));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 290, -1, -1));
 
         jLabel5.setText("Población");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 370, -1, -1));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 350, -1, -1));
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
-        txtcodigo.setText("Ingresa el codigo");
+        txtcodigo.setText("Ingresa el continente");
         txtcodigo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcodigoFocusGained(evt);
@@ -154,10 +226,10 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcodigoActionPerformed(evt);
             }
         });
-        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 298, 131, -1));
+        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 280, 160, 40));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
-        txtcontinente.setText("Ingresa el continente");
+        txtcontinente.setText("Ingresa el nombre");
         txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcontinenteFocusGained(evt);
@@ -171,10 +243,10 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcontinenteActionPerformed(evt);
             }
         });
-        getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 227, 131, -1));
+        getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 220, 160, 40));
 
         txtnombre.setForeground(new java.awt.Color(153, 153, 153));
-        txtnombre.setText("Ingresa el nombre");
+        txtnombre.setText("Ingresa el codigo");
         txtnombre.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtnombreFocusGained(evt);
@@ -183,7 +255,12 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtnombreFocusLost(evt);
             }
         });
-        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 169, 131, -1));
+        txtnombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtnombreActionPerformed(evt);
+            }
+        });
+        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 160, 160, 40));
 
         txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
         txtpoblacion.setText("Ingresa la población");
@@ -195,8 +272,14 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtpoblacionFocusLost(evt);
             }
         });
-        getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(225, 367, 131, -1));
+        txtpoblacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtpoblacionActionPerformed(evt);
+            }
+        });
+        getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 340, 160, 40));
 
+        jTable1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -213,9 +296,11 @@ public class VistaPaises extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.setGridColor(new java.awt.Color(204, 255, 255));
+        jTable1.setInheritsPopupMenu(true);
         jScrollPane1.setViewportView(jTable1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(456, 69, 545, 399));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 80, 560, 399));
 
         btnagregar.setText("Agregar");
         btnagregar.addActionListener(new java.awt.event.ActionListener() {
@@ -223,17 +308,39 @@ public class VistaPaises extends javax.swing.JFrame {
                 btnagregarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnagregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 485, -1, -1));
+        getContentPane().add(btnagregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, -1, -1));
 
         btnconsultar.setText("Consultar");
-        getContentPane().add(btnconsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 485, -1, -1));
+        getContentPane().add(btnconsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 490, -1, -1));
 
         btnmodificar.setText("Modificar");
-        getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(309, 485, -1, -1));
+        getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 490, -1, -1));
 
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FONDO PAIS.png"))); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sonido.png"))); // NOI18N
+        jButton1.setBorder(null);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 530, 70, 70));
+
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/maybe fondo.png"))); // NOI18N
         jLabel6.setText("jLabel6");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(-70, -40, 520, 680));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 380, 560));
+
+        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Papulandia.png"))); // NOI18N
+        jLabel8.setText("jLabel6");
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 500, 100, 110));
+
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FOndooo.png"))); // NOI18N
+        jLabel7.setText("jLabel7");
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 40, 930, 620));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -241,7 +348,7 @@ public class VistaPaises extends javax.swing.JFrame {
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
-        // 2. Creamos un array (una fila) con los datos de los campos de texto.
+        
         Object[] fila = new Object[4];
         fila[0] = txtcodigo.getText();
         fila[1] = txtnombre.getText();
@@ -249,8 +356,25 @@ public class VistaPaises extends javax.swing.JFrame {
         fila[3] = txtpoblacion.getText();
         
         
-        // 3. Agregamos la fila al modelo.
+        
         modelo.addRow(fila);
+        
+        // Campo Código (que en tu diseño actual es para el continente)
+    txtcodigo.setText("");
+    txtcodigo.setForeground(new Color(153,153,153));
+    
+    // Campo Nombre (que en tu diseño actual es para el código)
+    txtnombre.setText("");
+    txtnombre.setForeground(new Color(153,153,153));
+
+    // Campo Continente (que en tu diseño actual es para el nombre)
+    txtcontinente.setText("");
+    txtcontinente.setForeground(new Color(153,153,153));
+
+    // Campo Población
+    txtpoblacion.setText("");
+    txtpoblacion.setForeground(new Color(153,153,153));
+    // --- FIN DEL BLOQUE ---
 
    
     }//GEN-LAST:event_btnagregarActionPerformed
@@ -262,7 +386,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
     // TODO add your handling code here:
-        if(txtcodigo.getText().equals("Ingresa el codigo"))
+        if(txtcodigo.getText().equals("Ingresa el continente"))
         {
             txtcodigo.setText("");
             txtcodigo.setForeground(new Color(0,0,0));
@@ -271,14 +395,14 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
         if(txtcodigo.getText().equals("")){
-            txtcodigo.setText("Ingresa el codigo");
+            txtcodigo.setText("Ingresa el continente");
             txtcodigo.setForeground(new Color(153,153,153));
         }
     }//GEN-LAST:event_txtcodigoFocusLost
 
     private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
 
-        if(txtnombre.getText().equals("Ingresa el nombre"))
+        if(txtnombre.getText().equals("Ingresa el codigo"))
         {
             txtnombre.setText("");
             txtnombre.setForeground(new Color(0,0,0));
@@ -288,7 +412,7 @@ public class VistaPaises extends javax.swing.JFrame {
     private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
         // TODO add your handling code here:
         if(txtnombre.getText().equals("")){
-            txtnombre.setText("Ingresa el nombre");
+            txtnombre.setText("Ingresa el codigo");
             txtnombre.setForeground(new Color(153,153,153));
         }
     }//GEN-LAST:event_txtnombreFocusLost
@@ -299,7 +423,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
         // TODO add your handling code here:
-        if(txtcontinente.getText().equals("Ingresa el continente"))
+        if(txtcontinente.getText().equals("Ingresa el nombre"))
         {
             txtcontinente.setText("");
             txtcontinente.setForeground(new Color(0,0,0));
@@ -308,7 +432,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
         if(txtcontinente.getText().equals("")){
-            txtcontinente.setText("Ingresa el continente");
+            txtcontinente.setText("Ingresa el nombre");
             txtcontinente.setForeground(new Color(153,153,153));
         }
         
@@ -353,6 +477,35 @@ public class VistaPaises extends javax.swing.JFrame {
         yMouse = evt.getY();
     }//GEN-LAST:event_jPanel1MousePressed
 
+    private void txtpoblacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpoblacionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpoblacionActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (clipMusica != null) {
+            // Si la música está sonando...
+            if (musicaSonando) {
+                // ... la detenemos.
+                clipMusica.stop();
+                // Opcional: Cambia el texto del botón para que el usuario sepa
+                // btnMusica.setText("Activar Música");
+            } else {
+                // Si no está sonando...
+                // ... la iniciamos para que se repita continuamente.
+                clipMusica.loop(Clip.LOOP_CONTINUOUSLY);
+                // Opcional: Cambia el texto del botón
+                // btnMusica.setText("Desactivar Música");
+            }
+            // Invertimos el estado
+            musicaSonando = !musicaSonando;
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void txtnombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtnombreActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtnombreActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -362,12 +515,15 @@ public class VistaPaises extends javax.swing.JFrame {
     private javax.swing.JButton btnconsultar;
     private javax.swing.JButton btnmodificar;
     private javax.swing.JButton extBtn;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
