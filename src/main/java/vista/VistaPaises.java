@@ -32,12 +32,40 @@ public class VistaPaises extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setSize(1020, 600);
-        this.getRootPane().setDefaultButton(btnagregar);
         cargarMusicaDeFondo();
         personalizarTablaEstiloFrutiger(); 
+        establecerCursorPersonalizado();
+        this.getRootPane().setDefaultButton(btnagregar);
         
     }
+        private void establecerCursorPersonalizado() {
+    try {
+        // 1. Obten el Toolkit, que es la caja de herramientas de AWT
+        java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
 
+        // 2. Carga tu imagen desde los recursos
+        java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png"); // <-- ¡Asegúrate de que el nombre del archivo sea correcto!
+        java.awt.Image imagenCursor = new javax.swing.ImageIcon(urlDeLaImagen).getImage();
+
+        // 3. Define el "HotSpot" (el punto exacto del cursor que hace clic)
+        // Para la mayoría de los cursores, el punto (0, 0) que es la esquina superior izquierda, funciona bien.
+        java.awt.Point hotSpot = new java.awt.Point(0, 0);
+
+        // 4. Crea el objeto Cursor personalizado
+        java.awt.Cursor cursorPersonalizado = toolkit.createCustomCursor(
+            imagenCursor, 
+            hotSpot, 
+            "CursorAero" // Un nombre descriptivo para tu cursor
+        );
+
+        // 5. Aplica el cursor a TODA la ventana (JFrame)
+        this.setCursor(cursorPersonalizado);
+
+    } catch (Exception e) {
+        System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
+        // Si falla, se mantendrá el cursor por defecto del sistema.
+    }
+}
     private void personalizarTablaEstiloFrutiger() {
         
         // --- 1. Personalizar el Encabezado (Header) ---
@@ -142,7 +170,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Paises.png"))); // NOI18N
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 20, 380, -1));
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 380, -1));
 
         minBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/boton minizar.png"))); // NOI18N
         minBtn.setAutoscrolls(true);
@@ -201,16 +229,16 @@ public class VistaPaises extends javax.swing.JFrame {
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 40));
 
         jLabel2.setText("Codigo");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 170, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, -1, -1));
 
         jLabel3.setText("Nombre");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 230, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 250, -1, -1));
 
         jLabel4.setText("Continente");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 290, -1, -1));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 310, -1, -1));
 
         jLabel5.setText("Población");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 350, -1, -1));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 370, -1, -1));
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
         txtcodigo.setText("Ingresa el continente");
@@ -227,7 +255,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcodigoActionPerformed(evt);
             }
         });
-        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 280, 160, 40));
+        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 300, 160, 40));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
         txtcontinente.setText("Ingresa el nombre");
@@ -244,7 +272,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcontinenteActionPerformed(evt);
             }
         });
-        getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 220, 160, 40));
+        getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 240, 160, 40));
 
         txtnombre.setForeground(new java.awt.Color(153, 153, 153));
         txtnombre.setText("Ingresa el codigo");
@@ -261,7 +289,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtnombreActionPerformed(evt);
             }
         });
-        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 160, 160, 40));
+        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 160, 40));
 
         txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
         txtpoblacion.setText("Ingresa la población");
@@ -278,7 +306,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtpoblacionActionPerformed(evt);
             }
         });
-        getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 340, 160, 40));
+        getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 360, 160, 40));
 
         jTable1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -303,19 +331,36 @@ public class VistaPaises extends javax.swing.JFrame {
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 80, 560, 399));
 
-        btnagregar.setText("Agregar");
+        btnagregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Agregar.png"))); // NOI18N
+        btnagregar.setBorder(null);
+        btnagregar.setBorderPainted(false);
+        btnagregar.setContentAreaFilled(false);
+        btnagregar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnagregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnagregarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnagregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, -1, -1));
+        getContentPane().add(btnagregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 430, 130, 60));
 
-        btnconsultar.setText("Consultar");
-        getContentPane().add(btnconsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 490, -1, -1));
+        btnconsultar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Consultar.png"))); // NOI18N
+        btnconsultar.setBorder(null);
+        btnconsultar.setBorderPainted(false);
+        btnconsultar.setContentAreaFilled(false);
+        btnconsultar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnconsultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnconsultarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnconsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 510, 140, 50));
 
-        btnmodificar.setText("Modificar");
-        getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 490, -1, -1));
+        btnmodificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Modificar.png"))); // NOI18N
+        btnmodificar.setBorder(null);
+        btnmodificar.setBorderPainted(false);
+        btnmodificar.setContentAreaFilled(false);
+        btnmodificar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 510, 130, 50));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sonido.png"))); // NOI18N
         jButton1.setBorder(null);
@@ -505,6 +550,10 @@ public class VistaPaises extends javax.swing.JFrame {
     private void txtnombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtnombreActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtnombreActionPerformed
+
+    private void btnconsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnconsultarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnconsultarActionPerformed
 
     /**
      * @param args the command line arguments

@@ -61,9 +61,37 @@ public class VistaLogin extends javax.swing.JFrame {
         this.setResizable(false);
         this.setSize(1020, 600);
         this.getRootPane().setDefaultButton(btnlogin);
+        establecerCursorPersonalizado();
         
     }
+    private void establecerCursorPersonalizado() {
+    try {
+        // 1. Obten el Toolkit, que es la caja de herramientas de AWT
+        java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
 
+        // 2. Carga tu imagen desde los recursos
+        java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png"); // <-- ¡Asegúrate de que el nombre del archivo sea correcto!
+        java.awt.Image imagenCursor = new javax.swing.ImageIcon(urlDeLaImagen).getImage();
+
+        // 3. Define el "HotSpot" (el punto exacto del cursor que hace clic)
+        // Para la mayoría de los cursores, el punto (0, 0) que es la esquina superior izquierda, funciona bien.
+        java.awt.Point hotSpot = new java.awt.Point(0, 0);
+
+        // 4. Crea el objeto Cursor personalizado
+        java.awt.Cursor cursorPersonalizado = toolkit.createCustomCursor(
+            imagenCursor, 
+            hotSpot, 
+            "CursorAero" // Un nombre descriptivo para tu cursor
+        );
+
+        // 5. Aplica el cursor a TODA la ventana (JFrame)
+        this.setCursor(cursorPersonalizado);
+
+    } catch (Exception e) {
+        System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
+        // Si falla, se mantendrá el cursor por defecto del sistema.
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -124,7 +152,7 @@ public class VistaLogin extends javax.swing.JFrame {
                 btnloginKeyPressed(evt);
             }
         });
-        getContentPane().add(btnlogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 410, 390, 50));
+        getContentPane().add(btnlogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 410, 380, 50));
 
         txtusuario1.setForeground(new java.awt.Color(204, 204, 204));
         txtusuario1.setHorizontalAlignment(javax.swing.JTextField.LEFT);
