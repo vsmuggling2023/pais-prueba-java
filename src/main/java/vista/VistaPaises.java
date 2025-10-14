@@ -31,7 +31,7 @@ public class VistaPaises extends javax.swing.JFrame {
         setTitle("Lista de Paises");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.setSize(1020, 601);
+        this.setSize(1020, 600);
         cargarMusicaDeFondo();
         personalizarTablaEstiloFrutiger(); 
         establecerCursorPersonalizado();
