@@ -14,6 +14,10 @@ import javax.swing.JFrame;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 
 
 /**
@@ -36,6 +40,23 @@ public class VistaPaises extends javax.swing.JFrame {
         personalizarTablaEstiloFrutiger(); 
         establecerCursorPersonalizado();
         this.getRootPane().setDefaultButton(btnagregar);
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        public void valueChanged(ListSelectionEvent event) {
+            int filaSeleccionada = jTable1.getSelectedRow();
+            if (filaSeleccionada >= 0) {
+                DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+                txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
+                txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
+                txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
+                txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
+
+                txtcodigo.setForeground(Color.black);
+                txtnombre.setForeground(Color.black);
+                txtcontinente.setForeground(Color.black);
+                txtpoblacion.setForeground(Color.black);
+            }
+        }
+    });
         
     }
         private void establecerCursorPersonalizado() {
@@ -360,6 +381,11 @@ public class VistaPaises extends javax.swing.JFrame {
         btnmodificar.setBorderPainted(false);
         btnmodificar.setContentAreaFilled(false);
         btnmodificar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnmodificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnmodificarActionPerformed(evt);
+            }
+        });
         getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 510, 130, 50));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sonido.png"))); // NOI18N
@@ -554,6 +580,30 @@ public class VistaPaises extends javax.swing.JFrame {
     private void btnconsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnconsultarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnconsultarActionPerformed
+
+    private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        int filaSeleccionada = jTable1.getSelectedRow();
+
+        if (filaSeleccionada >= 0) {
+            modelo.setValueAt(txtcodigo.getText(), filaSeleccionada, 0);
+            modelo.setValueAt(txtnombre.getText(), filaSeleccionada, 1);
+            modelo.setValueAt(txtcontinente.getText(), filaSeleccionada, 2);
+            modelo.setValueAt(txtpoblacion.getText(), filaSeleccionada, 3);
+
+            // Limpiar campos y ajustar color si se quiere
+            txtcodigo.setText("");
+            txtcodigo.setForeground(new Color(153,153,153));
+            txtnombre.setText("");
+            txtnombre.setForeground(new Color(153,153,153));
+            txtcontinente.setText("");
+            txtcontinente.setForeground(new Color(153,153,153));
+            txtpoblacion.setText("");
+            txtpoblacion.setForeground(new Color(153,153,153));
+        } else {
+            JOptionPane.showMessageDialog(null, "Seleccione una fila para modificar.");
+        }
+    }//GEN-LAST:event_btnmodificarActionPerformed
 
     /**
      * @param args the command line arguments
