@@ -241,7 +241,7 @@ public class VistaPaises extends javax.swing.JFrame {
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 370, -1, -1));
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
-        txtcodigo.setText("Ingresa el continente");
+        txtcodigo.setText("Ingresa el codigo");
         txtcodigo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcodigoFocusGained(evt);
@@ -255,10 +255,10 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcodigoActionPerformed(evt);
             }
         });
-        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 300, 160, 40));
+        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 160, 40));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
-        txtcontinente.setText("Ingresa el nombre");
+        txtcontinente.setText("Ingresa el continente");
         txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcontinenteFocusGained(evt);
@@ -272,10 +272,10 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcontinenteActionPerformed(evt);
             }
         });
-        getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 240, 160, 40));
+        getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 300, 160, 40));
 
         txtnombre.setForeground(new java.awt.Color(153, 153, 153));
-        txtnombre.setText("Ingresa el codigo");
+        txtnombre.setText("Ingresa el nombre");
         txtnombre.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtnombreFocusGained(evt);
@@ -289,7 +289,7 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtnombreActionPerformed(evt);
             }
         });
-        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 160, 40));
+        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 240, 160, 40));
 
         txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
         txtpoblacion.setText("Ingresa la población");
@@ -431,7 +431,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
     // TODO add your handling code here:
-        if(txtcodigo.getText().equals("Ingresa el continente"))
+        if(txtcodigo.getText().equals("Ingresa el codigo"))
         {
             txtcodigo.setText("");
             txtcodigo.setForeground(new Color(0,0,0));
@@ -440,14 +440,14 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
         if(txtcodigo.getText().equals("")){
-            txtcodigo.setText("Ingresa el continente");
+            txtcodigo.setText("Ingresa el codigo");
             txtcodigo.setForeground(new Color(153,153,153));
         }
     }//GEN-LAST:event_txtcodigoFocusLost
 
     private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
 
-        if(txtnombre.getText().equals("Ingresa el codigo"))
+        if(txtnombre.getText().equals("Ingresa el nombre"))
         {
             txtnombre.setText("");
             txtnombre.setForeground(new Color(0,0,0));
@@ -457,7 +457,7 @@ public class VistaPaises extends javax.swing.JFrame {
     private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
         // TODO add your handling code here:
         if(txtnombre.getText().equals("")){
-            txtnombre.setText("Ingresa el codigo");
+            txtnombre.setText("Ingresa el nombre");
             txtnombre.setForeground(new Color(153,153,153));
         }
     }//GEN-LAST:event_txtnombreFocusLost
@@ -468,7 +468,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
         // TODO add your handling code here:
-        if(txtcontinente.getText().equals("Ingresa el nombre"))
+        if(txtcontinente.getText().equals("Ingresa el continente"))
         {
             txtcontinente.setText("");
             txtcontinente.setForeground(new Color(0,0,0));
@@ -477,7 +477,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
         if(txtcontinente.getText().equals("")){
-            txtcontinente.setText("Ingresa el nombre");
+            txtcontinente.setText("Ingresa el continente");
             txtcontinente.setForeground(new Color(153,153,153));
         }
         

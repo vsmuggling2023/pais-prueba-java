@@ -143,7 +143,6 @@
     <Component class="javax.swing.JPasswordField" name="txtpassword">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
-        <Property name="text" type="java.lang.String" value="********"/>
         <Property name="toolTipText" type="java.lang.String" value=""/>
         <Property name="actionCommand" type="java.lang.String" value=""/>
       </Properties>

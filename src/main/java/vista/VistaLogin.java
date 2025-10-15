@@ -178,7 +178,6 @@ public class VistaLogin extends javax.swing.JFrame {
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 530, 70, 70));
 
         txtpassword.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        txtpassword.setText("********");
         txtpassword.setToolTipText("");
         txtpassword.setActionCommand("");
         txtpassword.addMouseListener(new java.awt.event.MouseAdapter() {
