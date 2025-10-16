@@ -69,43 +69,42 @@ String filtro;
     }
         private void establecerCursorPersonalizado() {
     try {
-        // 1. Obten el Toolkit, que es la caja de herramientas de AWT
+     
         java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
 
-        // 2. Carga tu imagen desde los recursos
-        java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png"); // <-- ¡Asegúrate de que el nombre del archivo sea correcto!
+        
+        java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png"); 
         java.awt.Image imagenCursor = new javax.swing.ImageIcon(urlDeLaImagen).getImage();
 
-        // 3. Define el "HotSpot" (el punto exacto del cursor que hace clic)
-        // Para la mayoría de los cursores, el punto (0, 0) que es la esquina superior izquierda, funciona bien.
+       
         java.awt.Point hotSpot = new java.awt.Point(0, 0);
 
-        // 4. Crea el objeto Cursor personalizado
+       
         java.awt.Cursor cursorPersonalizado = toolkit.createCustomCursor(
             imagenCursor, 
             hotSpot, 
-            "CursorAero" // Un nombre descriptivo para tu cursor
+            "CursorAero"
         );
 
-        // 5. Aplica el cursor a TODA la ventana (JFrame)
+        
         this.setCursor(cursorPersonalizado);
 
     } catch (Exception e) {
         System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
-        // Si falla, se mantendrá el cursor por defecto del sistema.
+        
     }
 }
     private void personalizarTablaEstiloFrutiger() {
         
-        // --- 1. Personalizar el Encabezado (Header) ---
+        
         JTableHeader header = jTable1.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
         header.setOpaque(false);
-        // Un azul brillante y fresco, muy característico del estilo
+        
         header.setBackground(new Color(0, 176, 240)); 
         header.setForeground(Color.WHITE);
 
-        // --- 2. Personalizar las Celdas con Colores Frutiger Aero ---
+        
         jTable1.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(javax.swing.JTable table, Object value,
@@ -113,9 +112,9 @@ String filtro;
                 
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-                // Fila par: un blanco casi puro para dar luminosidad
+                
                 if (row % 2 == 0) {
-                    c.setBackground(new Color(245, 255, 255)); // Un blanco ligeramente azulado
+                    c.setBackground(new Color(245, 255, 255));
                     c.setForeground(Color.DARK_GRAY);
                 } else {
                     
@@ -133,28 +132,25 @@ String filtro;
             }
         });
 
-    // --- 3. Otros Ajustes Visuales ---
     jTable1.setRowHeight(28);
     jTable1.setGridColor(new Color(210, 235, 255));
     jTable1.setShowGrid(true);
 
-    // --- 4. HACER TRANSPARENTE EL SCROLLPANE Y LA TABLA --- ¡ESTA ES LA CLAVE!
-    
-    // Hacemos que el JScrollPane no pinte su fondo
+
     jScrollPane1.setOpaque(false);
     jScrollPane1.getViewport().setOpaque(false);
     
-    // Hacemos que la JTable no pinte su fondo
+   
     jTable1.setOpaque(true);
-    //jTable1.setBackground(new Color(0,0,0,0)); // Alternativa para hacerla completamente transparente
+   
 }
     private Clip clipMusica;
     private boolean musicaSonando = false;
     private void cargarMusicaDeFondo() {
     try {
-        // Busca el archivo en la carpeta de recursos
+        
         AudioInputStream audioStream = AudioSystem.getAudioInputStream(
-            getClass().getResource("/sounds/fondo.wav") // <-- ¡CAMBIA ESTO por el nombre de tu archivo!
+            getClass().getResource("/sounds/fondo.wav") 
         );
         clipMusica = AudioSystem.getClip();
         clipMusica.open(audioStream);
@@ -472,22 +468,22 @@ String filtro;
         
         modelo.addRow(fila);
         
-        // Campo Código (que en tu diseño actual es para el continente)
+     
     txtcodigo.setText("");
     txtcodigo.setForeground(new Color(153,153,153));
     
-    // Campo Nombre (que en tu diseño actual es para el código)
+   
     txtnombre.setText("");
     txtnombre.setForeground(new Color(153,153,153));
 
-    // Campo Continente (que en tu diseño actual es para el nombre)
+   
     txtcontinente.setText("");
     txtcontinente.setForeground(new Color(153,153,153));
 
-    // Campo Población
+    
     txtpoblacion.setText("");
     txtpoblacion.setForeground(new Color(153,153,153));
-    // --- FIN DEL BLOQUE ---
+   
 
    
     }//GEN-LAST:event_btnagregarActionPerformed
@@ -596,20 +592,17 @@ String filtro;
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (clipMusica != null) {
-            // Si la música está sonando...
+            
             if (musicaSonando) {
-                // ... la detenemos.
+              
                 clipMusica.stop();
-                // Opcional: Cambia el texto del botón para que el usuario sepa
-                // btnMusica.setText("Activar Música");
+               
             } else {
-                // Si no está sonando...
-                // ... la iniciamos para que se repita continuamente.
+               
                 clipMusica.loop(Clip.LOOP_CONTINUOUSLY);
-                // Opcional: Cambia el texto del botón
-                // btnMusica.setText("Desactivar Música");
+                
             }
-            // Invertimos el estado
+            
             musicaSonando = !musicaSonando;
         }
         // TODO add your handling code here:
@@ -642,7 +635,7 @@ String filtro;
             modelo.setValueAt(txtcontinente.getText(), filaSeleccionada, 2);
             modelo.setValueAt(txtpoblacion.getText(), filaSeleccionada, 3);
 
-            // Limpiar campos y ajustar color si se quiere
+            
             txtcodigo.setText("");
             txtcodigo.setForeground(new Color(153,153,153));
             txtnombre.setText("");
@@ -680,7 +673,35 @@ String filtro;
     }//GEN-LAST:event_txtnombreKeyTyped
 
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
-        // TODO add your handling code here:
+    Object[] opciones = {"Aceptar", "Cancelar"};
+
+    // 2. Mostrar un cuadro de diálogo con las opciones personalizadas
+    int respuesta = javax.swing.JOptionPane.showOptionDialog(
+        this, // El componente padre (esta misma ventana)
+        "¿Estás seguro de que deseas cerrar la sesión?", // El mensaje a mostrar
+        "Confirmar Cierre de Sesión", // El título de la ventana
+        javax.swing.JOptionPane.YES_NO_OPTION, // El tipo de opción
+        javax.swing.JOptionPane.QUESTION_MESSAGE, // El tipo de mensaje (icono)
+        null,    // No usamos un icono personalizado
+        opciones, // ¡Aquí pasamos nuestro array con los textos "Sí" y "No"!
+        opciones[0] // El botón que aparecerá seleccionado por defecto ("Sí")
+    );
+    
+    if (respuesta == javax.swing.JOptionPane.YES_OPTION) {
+       
+        
+       
+        if (clipMusica != null && clipMusica.isRunning()) {
+            clipMusica.stop();
+        }
+
+   
+        VistaLogin vistaLogin = new VistaLogin();
+        vistaLogin.setVisible(true);
+
+                this.dispose();
+    }
+
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
     
     public void filtro() {
