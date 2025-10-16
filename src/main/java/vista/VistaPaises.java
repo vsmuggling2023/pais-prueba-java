@@ -612,14 +612,13 @@ public class VistaPaises extends javax.swing.JFrame {
             txtpoblacion.setForeground(new Color(153,153,153));
         } else {
             JOptionPane.showMessageDialog(null, "Seleccione una fila para modificar.");
-            return;
         }
     }//GEN-LAST:event_btnmodificarActionPerformed
 
     private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
-        String texto = txtcodigo.getText().trim();
-        if (texto.length() <= 3){
-            JOptionPane.showMessageDialog(this, "Debe ser 3 caracter");
+        String texto = txtcodigo.getText();
+        if (texto.length() >= 3){
+            evt.consume();
         }
     }//GEN-LAST:event_txtcodigoKeyTyped
 
