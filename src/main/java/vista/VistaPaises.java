@@ -276,6 +276,11 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtcodigoActionPerformed(evt);
             }
         });
+        txtcodigo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtcodigoKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 160, 40));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
@@ -325,6 +330,11 @@ public class VistaPaises extends javax.swing.JFrame {
         txtpoblacion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtpoblacionActionPerformed(evt);
+            }
+        });
+        txtpoblacion.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtpoblacionKeyTyped(evt);
             }
         });
         getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 360, 160, 40));
@@ -604,6 +614,20 @@ public class VistaPaises extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Seleccione una fila para modificar.");
         }
     }//GEN-LAST:event_btnmodificarActionPerformed
+
+    private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
+        String texto = txtcodigo.getText();
+        if (texto.length() >= 3){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtcodigoKeyTyped
+
+    private void txtpoblacionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtpoblacionKeyTyped
+        char n = evt.getKeyChar();
+        if (n < '0' || n > '9'){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtpoblacionKeyTyped
 
     /**
      * @param args the command line arguments
