@@ -18,6 +18,12 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import javax.swing.table.TableRowSorter;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
+
 
 
 /**
@@ -25,7 +31,9 @@ import javax.swing.event.ListSelectionListener;
  * @author Mouli
  */
 public class VistaPaises extends javax.swing.JFrame {
-    
+
+private TableRowSorter trsfiltro;
+String filtro;
     /**
      * Creates new form VistaPaises
      */
@@ -315,6 +323,11 @@ public class VistaPaises extends javax.swing.JFrame {
                 txtnombreActionPerformed(evt);
             }
         });
+        txtnombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtnombreKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 240, 160, 40));
 
         txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
@@ -588,7 +601,16 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_txtnombreActionPerformed
 
     private void btnconsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnconsultarActionPerformed
-        // TODO add your handling code here:
+        txtnombre.addKeyListener(new KeyAdapter() {
+            
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            String cadena = txtnombre.getText();
+            txtnombre.setText(cadena);
+            repaint();
+            filtro();
+        }
+       });     
     }//GEN-LAST:event_btnconsultarActionPerformed
 
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
@@ -627,8 +649,23 @@ public class VistaPaises extends javax.swing.JFrame {
         if (n < '0' || n > '9'){
             evt.consume();
         }
+
     }//GEN-LAST:event_txtpoblacionKeyTyped
 
+    private void txtnombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtnombreKeyTyped
+        trsfiltro = new TableRowSorter(jTable1.getModel());
+        jTable1.setRowSorter(trsfiltro);
+
+                                   
+
+    }//GEN-LAST:event_txtnombreKeyTyped
+    
+    public void filtro() {
+        filtro = txtnombre.getText();
+        trsfiltro.setRowFilter(RowFilter.regexFilter(txtnombre.getText(),0));
+}
+    
+    
     /**
      * @param args the command line arguments
      */
