@@ -10,6 +10,9 @@ import javax.swing.JOptionPane;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import java.awt.Desktop;
+import java.net.URI;
+
 
 /**
  *
@@ -53,6 +56,7 @@ public class VistaLogin extends javax.swing.JFrame {
     }
 }
     int xMouse, yMouse;
+    private int papulandiaClickCount = 0;
     public VistaLogin() {
         initComponents();
         cargarMusicaDeFondo();
@@ -83,6 +87,26 @@ public class VistaLogin extends javax.swing.JFrame {
             hotSpot, 
             "CursorAero" // Un nombre descriptivo para tu cursor
         );
+        jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            papulandiaClickCount++; // Incrementa el contador con cada clic
+
+            // Si el contador llega a 3...
+            if (papulandiaClickCount == 3) {
+                try {
+                    // ...intenta abrir el enlace en el navegador
+                    Desktop.getDesktop().browse(new URI("https://www.youtube.com/watch?v=b57ueUYyQ9Y"));
+                } catch (Exception ex) {
+                    // Si algo sale mal, imprime un error en la consola
+                    System.out.println("No se pudo abrir el enlace: " + ex.getMessage());
+                }
+                
+                // Reinicia el contador para que se pueda volver a activar
+                papulandiaClickCount = 0; 
+            }
+        }
+    });
+
 
         // 5. Aplica el cursor a TODA la ventana (JFrame)
         this.setCursor(cursorPersonalizado);
@@ -120,6 +144,7 @@ public class VistaLogin extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Papulandia.png"))); // NOI18N
+        jLabel6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 500, 100, 110));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N

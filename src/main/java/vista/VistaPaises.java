@@ -23,7 +23,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
-
+import java.awt.Desktop;
+import java.net.URI;
 
 
 /**
@@ -38,6 +39,7 @@ String filtro;
      * Creates new form VistaPaises
      */
     int xMouse, yMouse;
+    private int papulandiaClickCount = 0;
     public VistaPaises() {
         initComponents();
         setTitle("Lista de Paises");
@@ -93,7 +95,27 @@ String filtro;
         System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
         
     }
+    jLabel8.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            papulandiaClickCount++; // Incrementa el contador con cada clic
+
+            // Si el contador llega a 3...
+            if (papulandiaClickCount == 3) {
+                try {
+                    // ...intenta abrir el enlace en el navegador
+                    Desktop.getDesktop().browse(new URI("https://www.youtube.com/shorts/q4oigdRoBG4"));
+                } catch (Exception ex) {
+                    // Si algo sale mal, imprime un error en la consola
+                    System.out.println("No se pudo abrir el enlace: " + ex.getMessage());
+                }
+                
+                // Reinicia el contador para que se pueda volver a activar
+                papulandiaClickCount = 0; 
+            }
+        }
+    });
 }
+
     private void personalizarTablaEstiloFrutiger() {
         
         
@@ -131,6 +153,7 @@ String filtro;
                 return c;
             }
         });
+        
 
     jTable1.setRowHeight(28);
     jTable1.setGridColor(new Color(210, 235, 255));
@@ -444,6 +467,7 @@ String filtro;
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 380, 560));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Papulandia.png"))); // NOI18N
+        jLabel8.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 490, 100, 110));
 
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
