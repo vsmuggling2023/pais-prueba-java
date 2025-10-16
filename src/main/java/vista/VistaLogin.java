@@ -64,6 +64,7 @@ public class VistaLogin extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setSize(1020, 600);
+        setIconImage(new javax.swing.ImageIcon(getClass().getResource("/icons/Papulandia2.png")).getImage());
         this.getRootPane().setDefaultButton(btnlogin);
         establecerCursorPersonalizado();
         
