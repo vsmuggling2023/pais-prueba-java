@@ -489,6 +489,21 @@ String filtro;
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
+        String codigo = txtcodigo.getText();
+        String nombre = txtnombre.getText();
+        String continente = txtcontinente.getText();
+        String poblacion = txtpoblacion.getText();
+
+
+        if (codigo.isEmpty() || codigo.equals("Ingresa el codigo") ||
+            nombre.isEmpty() || nombre.equals("Ingresa el nombre") ||
+            continente.isEmpty() || continente.equals("Ingresa el continente") ||
+            poblacion.isEmpty() || poblacion.equals("Ingresa la población")) {
+            
+           
+            JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+            return; 
+        }
         
         Object[] fila = new Object[4];
         fila[0] = txtcodigo.getText();
