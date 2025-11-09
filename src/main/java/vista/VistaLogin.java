@@ -12,6 +12,15 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import java.awt.Desktop;
 import java.net.URI;
+import conn.Conexion;
+import java.security.MessageDigest;
+// Importa las clases necesarias de SQL
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
 
 
 /**
@@ -69,6 +78,67 @@ public class VistaLogin extends javax.swing.JFrame {
         establecerCursorPersonalizado();
         
     }
+    private static class Seguridad {
+        public static String sha256(String input) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hash = md.digest(input.getBytes("UTF-8"));
+                StringBuilder hexString = new StringBuilder();
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
+                    if (hex.length() == 1) hexString.append('0');
+                    hexString.append(hex);
+                }
+                return hexString.toString();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+    
+    private void login() {
+        playSound("Click.wav");
+        String user = txtusuario1.getText().trim();
+        String password = new String(txtpassword.getPassword()).trim();
+
+        // Validar que no estén vacíos
+        if (user.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String passHash = Seguridad.sha256(password);
+
+        try {
+            Connection conn = Conexion.getConnection(); // Tu clase conn.Conexion
+            String sql = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena_hash = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, user);
+            ps.setString(2, passHash);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                // Usuario válido
+                VistaPaises vista = new VistaPaises();
+                if (clipMusica != null && clipMusica.isRunning()) {
+                    clipMusica.stop();
+                }
+                vista.setVisible(true);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Revisa tus credenciales!", "Error de contraseña", JOptionPane.ERROR_MESSAGE);
+            }
+
+            rs.close();
+            ps.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos:\n" + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     private void establecerCursorPersonalizado() {
     try {
         // 1. Obten el Toolkit, que es la caja de herramientas de AWT
@@ -296,28 +366,7 @@ public class VistaLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
       
     private void btnloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnloginActionPerformed
-        playSound("Click.wav");
-        
-        String usuario = txtpassword.getText();
-        String password = txtpassword.getText();
-        
-        if (usuario.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
-            return; // Salir del método si hay campos vacíos
-        }
-        
-        String usuario1 = "admin";
-        String password1 = "admin";
-        if(usuario.equals(usuario1) && password.equals(password1)){
-            VistaPaises vista  = new VistaPaises();
-            if (clipMusica != null && clipMusica.isRunning()) {
-            clipMusica.stop(); 
-        }
-            vista.setVisible(true);
-            this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Revisa tus credenciales!", "Error de contraseña", JOptionPane.ERROR_MESSAGE);
-        }
+        login();
     }//GEN-LAST:event_btnloginActionPerformed
 
     private void btnloginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnloginKeyPressed
