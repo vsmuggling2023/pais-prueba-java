@@ -25,7 +25,14 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import java.awt.Desktop;
 import java.net.URI;
-
+import conn.Conexion;
+// Importa las clases necesarias de SQL
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
 
 /**
  *
@@ -33,13 +40,12 @@ import java.net.URI;
  */
 public class VistaPaises extends javax.swing.JFrame {
 
-private TableRowSorter trsfiltro;
-String filtro;
     /**
      * Creates new form VistaPaises
      */
     int xMouse, yMouse;
     private int papulandiaClickCount = 0;
+
     public VistaPaises() {
         initComponents();
         setTitle("Lista de Paises");
@@ -48,140 +54,276 @@ String filtro;
         this.setSize(1020, 600);
         cargarMusicaDeFondo();
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/icons/Papulandia2.png")).getImage());
-        personalizarTablaEstiloFrutiger(); 
+        personalizarTablaEstiloFrutiger();
         establecerCursorPersonalizado();
         this.getRootPane().setDefaultButton(btnagregar);
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-        public void valueChanged(ListSelectionEvent event) {
-            int filaSeleccionada = jTable1.getSelectedRow();
-            if (filaSeleccionada >= 0) {
-                DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-                txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
-                txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
-                txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
-                txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
+            public void valueChanged(ListSelectionEvent event) {
+                int filaSeleccionada = jTable1.getSelectedRow();
+                if (filaSeleccionada >= 0) {
+                    DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+                    txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
+                    txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
+                    txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
+                    txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
 
-                txtcodigo.setForeground(Color.black);
-                txtnombre.setForeground(Color.black);
-                txtcontinente.setForeground(Color.black);
-                txtpoblacion.setForeground(Color.black);
+                    txtcodigo.setForeground(Color.black);
+                    txtnombre.setForeground(Color.black);
+                    txtcontinente.setForeground(Color.black);
+                    txtpoblacion.setForeground(Color.black);
+                }
             }
-        }
-    });
-        
+        });
+        buscarPaises();
     }
-        private void establecerCursorPersonalizado() {
-    try {
-     
-        java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
 
-        
-        java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png"); 
-        java.awt.Image imagenCursor = new javax.swing.ImageIcon(urlDeLaImagen).getImage();
+    private void establecerCursorPersonalizado() {
+        try {
 
-       
-        java.awt.Point hotSpot = new java.awt.Point(0, 0);
+            java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
 
-       
-        java.awt.Cursor cursorPersonalizado = toolkit.createCustomCursor(
-            imagenCursor, 
-            hotSpot, 
-            "CursorAero"
+            java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png");
+            java.awt.Image imagenCursor = new javax.swing.ImageIcon(urlDeLaImagen).getImage();
+
+            java.awt.Point hotSpot = new java.awt.Point(0, 0);
+
+            java.awt.Cursor cursorPersonalizado = toolkit.createCustomCursor(
+                    imagenCursor,
+                    hotSpot,
+                    "CursorAero"
+            );
+
+            this.setCursor(cursorPersonalizado);
+
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
+
+        }
+        jLabel8.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                papulandiaClickCount++; // Incrementa el contador con cada clic
+
+                // Si el contador llega a 3...
+                if (papulandiaClickCount == 3) {
+                    try {
+                        // ...intenta abrir el enlace en el navegador
+                        Desktop.getDesktop().browse(new URI("https://www.youtube.com/shorts/q4oigdRoBG4"));
+                    } catch (Exception ex) {
+                        // Si algo sale mal, imprime un error en la consola
+                        System.out.println("No se pudo abrir el enlace: " + ex.getMessage());
+                    }
+
+                    // Reinicia el contador para que se pueda volver a activar
+                    papulandiaClickCount = 0;
+                }
+            }
+        });
+    }
+
+    /**
+     * Ejecuta una consulta SQL dinámica a la base de datos 'country' basándose
+     * en los campos de texto y actualiza la jTable.
+     */
+    private void buscarPaises() {
+        // Define las columnas para el modelo de la tabla
+        DefaultTableModel modelo = new DefaultTableModel(
+                new Object[]{"Codigo", "Nombre", "Continente", "Poblacion"}, 0
         );
 
-        
-        this.setCursor(cursorPersonalizado);
+        // 1. Prepara la consulta SQL base
+        // (Asegúrate que los nombres de columna sean 'Code', 'Name', etc. como en tu BD)
+        String sqlBase = "SELECT Code, Name, Continent, Population FROM country";
 
-    } catch (Exception e) {
-        System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
-        
-    }
-    jLabel8.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            papulandiaClickCount++; // Incrementa el contador con cada clic
+        // Listas para construir la consulta dinámica de forma segura
+        ArrayList<String> conditions = new ArrayList<>();
+        ArrayList<Object> params = new ArrayList<>();
 
-            // Si el contador llega a 3...
-            if (papulandiaClickCount == 3) {
-                try {
-                    // ...intenta abrir el enlace en el navegador
-                    Desktop.getDesktop().browse(new URI("https://www.youtube.com/shorts/q4oigdRoBG4"));
-                } catch (Exception ex) {
-                    // Si algo sale mal, imprime un error en la consola
-                    System.out.println("No se pudo abrir el enlace: " + ex.getMessage());
+        // 2. Recoge los textos de los campos
+        String codigo = txtcodigo.getText();
+        String nombre = txtnombre.getText();
+        String continente = txtcontinente.getText();
+        String poblacion = txtpoblacion.getText();
+
+        try {
+            // 3. Añade condiciones SÓLO si el campo está lleno
+
+            // Si el campo 'codigo' no está vacío ni es el placeholder
+            if (!codigo.isEmpty() && !codigo.equals("Ingresa el codigo")) {
+                conditions.add("Code LIKE ?"); // Buscar por código
+                params.add(codigo + "%");      // Parámetro para 'Code'
+            }
+
+            // Si el campo 'nombre' no está vacío...
+            if (!nombre.isEmpty() && !nombre.equals("Ingresa el nombre")) {
+                conditions.add("Name LIKE ?"); // Buscar por nombre
+                params.add("%" + nombre + "%");  // Parámetro para 'Name' (con comodines)
+            }
+
+            // Si el campo 'continente' no está vacío...
+            if (!continente.isEmpty() && !continente.equals("Ingresa el continente")) {
+                conditions.add("Continent LIKE ?"); // Buscar por continente
+                params.add("%" + continente + "%"); // Parámetro para 'Continent'
+            }
+
+            // Si el campo 'poblacion' no está vacío...
+            if (!poblacion.isEmpty() && !poblacion.equals("Ingresa la población")) {
+                conditions.add("Population >= ?"); // Buscar población MAYOR O IGUAL que
+                params.add(Integer.parseInt(poblacion)); // Parámetro numérico
+            }
+
+            // 4. Construye la consulta final
+            if (!conditions.isEmpty()) {
+                // Si hay al menos una condición, une todas con " AND "
+                sqlBase += " WHERE " + String.join(" AND ", conditions);
+            }
+
+            sqlBase += " LIMIT 100"; // Limitar a 100 resultados
+
+            // 5. Ejecuta la consulta
+            Connection miConexion = Conexion.getConnection();
+
+            // Usamos PreparedStatement para insertar los parámetros de forma segura
+            try (PreparedStatement pstmt = miConexion.prepareStatement(sqlBase)) {
+
+                // Asigna los valores de la lista 'params' a la consulta
+                for (int i = 0; i < params.size(); i++) {
+                    pstmt.setObject(i + 1, params.get(i));
                 }
-                
-                // Reinicia el contador para que se pueda volver a activar
-                papulandiaClickCount = 0; 
+
+                // Ejecuta la consulta y obtén los resultados
+                try (ResultSet rs = pstmt.executeQuery()) {
+
+                    System.out.println("Ejecutando consulta: " + pstmt.toString());
+
+                    // 6. Recorre los resultados y llena el modelo de la tabla
+                    while (rs.next()) {
+                        modelo.addRow(new Object[]{
+                            rs.getString("Code"),
+                            rs.getString("Name"),
+                            rs.getString("Continent"),
+                            rs.getInt("Population")
+                        });
+                    }
+
+                    if (modelo.getRowCount() == 0) {
+                        System.out.println("No se encontraron resultados para la búsqueda.");
+                    } else {
+                        System.out.println(modelo.getRowCount() + " países cargados.");
+                    }
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "La población debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
+        // 7. Asigna el modelo (lleno o vacío) a la tabla
+        jTable1.setModel(modelo);
+        // Vuelve a aplicar el estilo Frutiger a la tabla (importante)
+        personalizarTablaEstiloFrutiger();
+    }
+
+    public class EjemploConsulta {
+
+        public void consultarPaises() {
+            // 1. Obtienes la conexión estática
+            Connection miConexion = Conexion.getConnection();
+
+            // Verificas que la conexión no sea nula
+            if (miConexion != null) {
+
+                // 2. Escribes tu consulta a la tabla 'country'
+                String sql = "SELECT Name, Continent, Population FROM country WHERE Continent = 'South America'";
+
+                try (Statement stmt = miConexion.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+
+                    System.out.println("--- Países de Sudamérica en la BD 'world' ---");
+
+                    // 3. Recorres los resultados
+                    while (rs.next()) {
+                        String nombre = rs.getString("Name");
+                        String continente = rs.getString("Continent");
+                        int poblacion = rs.getInt("Population");
+
+                        System.out.println(nombre + " (" + continente + ") - Población: " + poblacion);
+                    }
+
+                } catch (SQLException e) {
+                    System.out.println("❌ Error al ejecutar la consulta SQL");
+                    e.printStackTrace();
+                }
+                // (Opcional) Puedes cerrar la conexión cuando tu app se cierre
+                // Conexion.closeConnection();
             }
         }
-    });
-}
+    }
 
     private void personalizarTablaEstiloFrutiger() {
-        
-        
+
         JTableHeader header = jTable1.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
         header.setOpaque(false);
-        
-        header.setBackground(new Color(0, 176, 240)); 
+
+        header.setBackground(new Color(0, 176, 240));
         header.setForeground(Color.WHITE);
 
-        
         jTable1.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(javax.swing.JTable table, Object value,
-                                                             boolean isSelected, boolean hasFocus, int row, int column) {
-                
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-                
                 if (row % 2 == 0) {
                     c.setBackground(new Color(245, 255, 255));
                     c.setForeground(Color.DARK_GRAY);
                 } else {
-                    
-                    c.setBackground(new Color(220, 245, 255)); 
+
+                    c.setBackground(new Color(220, 245, 255));
                     c.setForeground(Color.DARK_GRAY);
                 }
 
-                
                 if (isSelected) {
                     c.setBackground(new Color(50, 150, 255));
                     c.setForeground(Color.WHITE);
                 }
-                
+
                 return c;
             }
         });
-        
 
-    jTable1.setRowHeight(28);
-    jTable1.setGridColor(new Color(210, 235, 255));
-    jTable1.setShowGrid(true);
+        jTable1.setRowHeight(28);
+        jTable1.setGridColor(new Color(210, 235, 255));
+        jTable1.setShowGrid(true);
 
+        jScrollPane1.setOpaque(false);
+        jScrollPane1.getViewport().setOpaque(false);
 
-    jScrollPane1.setOpaque(false);
-    jScrollPane1.getViewport().setOpaque(false);
-    
-   
-    jTable1.setOpaque(true);
-   
-}
+        jTable1.setOpaque(true);
+
+    }
     private Clip clipMusica;
     private boolean musicaSonando = false;
+
     private void cargarMusicaDeFondo() {
-    try {
-        
-        AudioInputStream audioStream = AudioSystem.getAudioInputStream(
-            getClass().getResource("/sounds/fondo.wav") 
-        );
-        clipMusica = AudioSystem.getClip();
-        clipMusica.open(audioStream);
-    } catch (Exception ex) {
-        System.out.println("Error al cargar la música de fondo: " + ex.getMessage());
+        try {
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(
+                    getClass().getResource("/sounds/fondo.wav")
+            );
+            clipMusica = AudioSystem.getClip();
+            clipMusica.open(audioStream);
+        } catch (Exception ex) {
+            System.out.println("Error al cargar la música de fondo: " + ex.getMessage());
+        }
     }
-}
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -487,89 +629,114 @@ String filtro;
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
-        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-
         String codigo = txtcodigo.getText();
         String nombre = txtnombre.getText();
         String continente = txtcontinente.getText();
         String poblacion = txtpoblacion.getText();
 
+        // 2. Validar que los campos no estén vacíos (con los placeholders)
+        if (codigo.isEmpty() || codigo.equals("Ingresa el codigo")
+                || nombre.isEmpty() || nombre.equals("Ingresa el nombre")
+                || continente.isEmpty() || continente.equals("Ingresa el continente")
+                || poblacion.isEmpty() || poblacion.equals("Ingresa la población")) {
 
-        if (codigo.isEmpty() || codigo.equals("Ingresa el codigo") ||
-            nombre.isEmpty() || nombre.equals("Ingresa el nombre") ||
-            continente.isEmpty() || continente.equals("Ingresa el continente") ||
-            poblacion.isEmpty() || poblacion.equals("Ingresa la población")) {
-            
-           
             JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
-            return; 
+            return; // Salir si algo falta
         }
-        
-        Object[] fila = new Object[4];
-        fila[0] = txtcodigo.getText();
-        fila[1] = txtnombre.getText();
-        fila[2] = txtcontinente.getText();
-        fila[3] = txtpoblacion.getText();
-        
-        
-        
-        modelo.addRow(fila);
-        
-     
-    txtcodigo.setText("");
-    txtcodigo.setForeground(new Color(153,153,153));
-    
-   
-    txtnombre.setText("");
-    txtnombre.setForeground(new Color(153,153,153));
 
-   
-    txtcontinente.setText("");
-    txtcontinente.setForeground(new Color(153,153,153));
+        // --- INICIA LA LÓGICA DE BASE DE DATOS ---
+        
+        Connection miConexion = null;
+        try {
+            // 3. Obtener la conexión
+            miConexion = Conexion.getConnection();
+            
+            // 4. Preparar la consulta SQL (¡Usa los nombres de columna de tu BD!)
+            // (Asumo que son 'Code', 'Name', 'Continent', 'Population' de la BD 'world')
+            String sql = "INSERT INTO country (Code, Name, Continent, Population) VALUES (?, ?, ?, ?)";
+            
+            // 5. Usar PreparedStatement para insertar datos de forma segura
+            try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
+                
+                // 6. Asignar los valores a los '?'
+                pstmt.setString(1, codigo);      // El 'Code' (ej: "CHL")
+                pstmt.setString(2, nombre);      // El 'Name'
+                pstmt.setString(3, continente);  // El 'Continent'
+                pstmt.setInt(4, Integer.parseInt(poblacion)); // La 'Population'
+                
+                // 7. Ejecutar la inserción
+                int filasAfectadas = pstmt.executeUpdate();
+                
+                // 8. Verificar si la inserción fue exitosa
+                if (filasAfectadas > 0) {
+                    JOptionPane.showMessageDialog(this, "¡País agregado exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    
+                    // 9. Actualizar la tabla visual
+                    // (Llama al método de búsqueda que hicimos antes para refrescar)
+                    buscarPaises(); 
+                    
+                    // 10. Limpiar los campos de texto
+                    txtcodigo.setText("Ingresa el codigo");
+                    txtcodigo.setForeground(new Color(153, 153, 153));
+                    txtnombre.setText("Ingresa el nombre");
+                    txtnombre.setForeground(new Color(153, 153, 153));
+                    txtcontinente.setText("Ingresa el continente");
+                    txtcontinente.setForeground(new Color(153, 153, 153));
+                    txtpoblacion.setText("Ingresa la población");
+                    txtpoblacion.setForeground(new Color(153, 153, 153));
+                    
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se pudo agregar el país.", "Error", JOptionPane.WARNING_MESSAGE);
+                }
+            }
 
-    
-    txtpoblacion.setText("");
-    txtpoblacion.setForeground(new Color(153,153,153));
-   
-
-   
+        } catch (SQLException e) {
+            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
+            JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            // Error si la población no es un número
+            JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            // Cualquier otro error (ej: conexión)
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_btnagregarActionPerformed
 
     private void txtcodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigoActionPerformed
         // TODO add your handling code here:
-    
+
     }//GEN-LAST:event_txtcodigoActionPerformed
 
     private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
-    // TODO add your handling code here:
-        if(txtcodigo.getText().equals("Ingresa el codigo"))
-        {
+        // TODO add your handling code here:
+        if (txtcodigo.getText().equals("Ingresa el codigo")) {
             txtcodigo.setText("");
-            txtcodigo.setForeground(new Color(0,0,0));
+            txtcodigo.setForeground(new Color(0, 0, 0));
         }
     }//GEN-LAST:event_txtcodigoFocusGained
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
-        if(txtcodigo.getText().equals("")){
+        if (txtcodigo.getText().equals("")) {
             txtcodigo.setText("Ingresa el codigo");
-            txtcodigo.setForeground(new Color(153,153,153));
+            txtcodigo.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtcodigoFocusLost
 
     private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
 
-        if(txtnombre.getText().equals("Ingresa el nombre"))
-        {
+        if (txtnombre.getText().equals("Ingresa el nombre")) {
             txtnombre.setText("");
-            txtnombre.setForeground(new Color(0,0,0));
+            txtnombre.setForeground(new Color(0, 0, 0));
         }
     }//GEN-LAST:event_txtnombreFocusGained
 
     private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
         // TODO add your handling code here:
-        if(txtnombre.getText().equals("")){
+        if (txtnombre.getText().equals("")) {
             txtnombre.setText("Ingresa el nombre");
-            txtnombre.setForeground(new Color(153,153,153));
+            txtnombre.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtnombreFocusLost
 
@@ -579,34 +746,32 @@ String filtro;
 
     private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
         // TODO add your handling code here:
-        if(txtcontinente.getText().equals("Ingresa el continente"))
-        {
+        if (txtcontinente.getText().equals("Ingresa el continente")) {
             txtcontinente.setText("");
-            txtcontinente.setForeground(new Color(0,0,0));
+            txtcontinente.setForeground(new Color(0, 0, 0));
         }
     }//GEN-LAST:event_txtcontinenteFocusGained
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
-        if(txtcontinente.getText().equals("")){
+        if (txtcontinente.getText().equals("")) {
             txtcontinente.setText("Ingresa el continente");
-            txtcontinente.setForeground(new Color(153,153,153));
+            txtcontinente.setForeground(new Color(153, 153, 153));
         }
-        
+
     }//GEN-LAST:event_txtcontinenteFocusLost
 
     private void txtpoblacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusGained
         // TODO add your handling code here:
-        if(txtpoblacion.getText().equals("Ingresa la población"))
-        {
+        if (txtpoblacion.getText().equals("Ingresa la población")) {
             txtpoblacion.setText("");
-            txtpoblacion.setForeground(new Color(0,0,0));
+            txtpoblacion.setForeground(new Color(0, 0, 0));
         }
     }//GEN-LAST:event_txtpoblacionFocusGained
 
     private void txtpoblacionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusLost
-        if(txtpoblacion.getText().equals("")){
+        if (txtpoblacion.getText().equals("")) {
             txtpoblacion.setText("Ingresa la población");
-            txtpoblacion.setForeground(new Color(153,153,153));
+            txtpoblacion.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtpoblacionFocusLost
 
@@ -625,7 +790,7 @@ String filtro;
     private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
         int x = evt.getXOnScreen();
         int y = evt.getYOnScreen();
-        this.setLocation(x - xMouse,y - yMouse);        // TODO add your handling code here:
+        this.setLocation(x - xMouse, y - yMouse);        // TODO add your handling code here:
     }//GEN-LAST:event_jPanel1MouseDragged
 
     private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
@@ -639,17 +804,17 @@ String filtro;
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (clipMusica != null) {
-            
+
             if (musicaSonando) {
-              
+
                 clipMusica.stop();
-               
+
             } else {
-               
+
                 clipMusica.loop(Clip.LOOP_CONTINUOUSLY);
-                
+
             }
-            
+
             musicaSonando = !musicaSonando;
         }
         // TODO add your handling code here:
@@ -660,106 +825,157 @@ String filtro;
     }//GEN-LAST:event_txtnombreActionPerformed
 
     private void btnconsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnconsultarActionPerformed
-        txtnombre.addKeyListener(new KeyAdapter() {
-            
-        @Override
-        public void keyReleased(final KeyEvent e) {
-            String cadena = txtnombre.getText();
-            txtnombre.setText(cadena);
-            repaint();
-            filtro();
-        }
-       });     
+        buscarPaises();
     }//GEN-LAST:event_btnconsultarActionPerformed
 
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
-        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-        int filaSeleccionada = jTable1.getSelectedRow();
+int filaSeleccionada = jTable1.getSelectedRow();
 
-        if (filaSeleccionada >= 0) {
-            modelo.setValueAt(txtcodigo.getText(), filaSeleccionada, 0);
-            modelo.setValueAt(txtnombre.getText(), filaSeleccionada, 1);
-            modelo.setValueAt(txtcontinente.getText(), filaSeleccionada, 2);
-            modelo.setValueAt(txtpoblacion.getText(), filaSeleccionada, 3);
-
-            
-            txtcodigo.setText("");
-            txtcodigo.setForeground(new Color(153,153,153));
-            txtnombre.setText("");
-            txtnombre.setForeground(new Color(153,153,153));
-            txtcontinente.setText("");
-            txtcontinente.setForeground(new Color(153,153,153));
-            txtpoblacion.setText("");
-            txtpoblacion.setForeground(new Color(153,153,153));
-        } else {
-            JOptionPane.showMessageDialog(null, "Seleccione una fila para modificar.");
+        // 2. Validar que haya una fila seleccionada
+        if (filaSeleccionada < 0) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un país de la tabla para modificar.", "Fila no seleccionada", JOptionPane.WARNING_MESSAGE);
+            return; // Salir del método si no hay nada seleccionado
         }
+
+        // 3. Obtener el CÓDIGO ORIGINAL (PK) de la tabla
+        //    (Es más seguro que leerlo del textfield, por si el usuario lo cambió)
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        String codigoOriginal = modelo.getValueAt(filaSeleccionada, 0).toString();
+
+        // 4. Obtener los NUEVOS valores de los campos de texto
+        String codigoNuevo = txtcodigo.getText();
+        String nombreNuevo = txtnombre.getText();
+        String continenteNuevo = txtcontinente.getText();
+        String poblacionNueva = txtpoblacion.getText();
+
+        // 5. Validar que los campos no estén vacíos (con los placeholders)
+        if (codigoNuevo.isEmpty() || codigoNuevo.equals("Ingresa el codigo")
+                || nombreNuevo.isEmpty() || nombreNuevo.equals("Ingresa el nombre")
+                || continenteNuevo.isEmpty() || continenteNuevo.equals("Ingresa el continente")
+                || poblacionNueva.isEmpty() || poblacionNueva.equals("Ingresa la población")) {
+
+            JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // --- INICIA LA LÓGICA DE BASE DE DATOS ---
+        
+        Connection miConexion = null;
+        try {
+            // 6. Obtener la conexión
+            miConexion = Conexion.getConnection();
+            
+            // 7. Preparar la consulta SQL UPDATE
+            //    (Usamos los nombres de columna de tu BD: Code, Name, Continent, Population)
+            //    Esto te permite modificar todos los campos, incluso el código (PK)
+            String sql = "UPDATE country SET Code = ?, Name = ?, Continent = ?, Population = ? WHERE Code = ?";
+            
+            try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
+                
+                // 8. Asignar los NUEVOS valores (columnas SET)
+                pstmt.setString(1, codigoNuevo);
+                pstmt.setString(2, nombreNuevo);
+                pstmt.setString(3, continenteNuevo);
+                pstmt.setInt(4, Integer.parseInt(poblacionNueva));
+                
+                // 9. Asignar el CÓDIGO ORIGINAL (columna WHERE)
+                //    Así sabe qué fila actualizar
+                pstmt.setString(5, codigoOriginal);
+                
+                // 10. Ejecutar la modificación
+                int filasAfectadas = pstmt.executeUpdate();
+                
+                // 11. Verificar el resultado
+                if (filasAfectadas > 0) {
+                    JOptionPane.showMessageDialog(this, "¡País modificado exitosamente en la BD!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    
+                    // 12. Refrescar la tabla (llamando al método que ya creamos)
+                    buscarPaises();
+                    
+                    // 13. Limpiar los campos (como en tu código original)
+                    txtcodigo.setText("Ingresa el codigo");
+                    txtcodigo.setForeground(new Color(153, 153, 153));
+                    txtnombre.setText("Ingresa el nombre");
+                    txtnombre.setForeground(new Color(153, 153, 153));
+                    txtcontinente.setText("Ingresa el continente");
+                    txtcontinente.setForeground(new Color(153, 153, 153));
+                    txtpoblacion.setText("Ingresa la población");
+                    txtpoblacion.setForeground(new Color(153, 153, 153));
+                    
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el país para modificar (pudo ser borrado por otro usuario).", "Error", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+
+        } catch (SQLException e) {
+            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
+            String mensajeError = e.getMessage();
+            if (mensajeError.contains("Duplicate entry")) {
+                JOptionPane.showMessageDialog(this, "Error: El nuevo código '" + codigoNuevo + "' ya existe en la BD.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al modificar en la base de datos: " + mensajeError, "Error SQL", JOptionPane.ERROR_MESSAGE);
+            }
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            // Error si la población no es un número
+            JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            // Cualquier otro error (ej: conexión)
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    
     }//GEN-LAST:event_btnmodificarActionPerformed
 
     private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
         String texto = txtcodigo.getText();
-        if (texto.length() >= 3){
+        if (texto.length() >= 3) {
             evt.consume();
         }
     }//GEN-LAST:event_txtcodigoKeyTyped
 
     private void txtpoblacionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtpoblacionKeyTyped
         char n = evt.getKeyChar();
-        if (n < '0' || n > '9'){
+        if (n < '0' || n > '9') {
             evt.consume();
         }
 
     }//GEN-LAST:event_txtpoblacionKeyTyped
 
     private void txtnombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtnombreKeyTyped
-        trsfiltro = new TableRowSorter(jTable1.getModel());
-        jTable1.setRowSorter(trsfiltro);
 
-                                   
 
     }//GEN-LAST:event_txtnombreKeyTyped
 
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
-    Object[] opciones = {"Aceptar", "Cancelar"};
+        Object[] opciones = {"Aceptar", "Cancelar"};
 
-    // 2. Mostrar un cuadro de diálogo con las opciones personalizadas
-    int respuesta = javax.swing.JOptionPane.showOptionDialog(
-        this, // El componente padre (esta misma ventana)
-        "¿Estás seguro de que deseas cerrar la sesión?", // El mensaje a mostrar
-        "Confirmar Cierre de Sesión", // El título de la ventana
-        javax.swing.JOptionPane.YES_NO_OPTION, // El tipo de opción
-        javax.swing.JOptionPane.QUESTION_MESSAGE, // El tipo de mensaje (icono)
-        null,    // No usamos un icono personalizado
-        opciones, // ¡Aquí pasamos nuestro array con los textos "Sí" y "No"!
-        opciones[0] // El botón que aparecerá seleccionado por defecto ("Sí")
-    );
-    
-    if (respuesta == javax.swing.JOptionPane.YES_OPTION) {
-       
-        
-       
-        if (clipMusica != null && clipMusica.isRunning()) {
-            clipMusica.stop();
+        // 2. Mostrar un cuadro de diálogo con las opciones personalizadas
+        int respuesta = javax.swing.JOptionPane.showOptionDialog(
+                this, // El componente padre (esta misma ventana)
+                "¿Estás seguro de que deseas cerrar la sesión?", // El mensaje a mostrar
+                "Confirmar Cierre de Sesión", // El título de la ventana
+                javax.swing.JOptionPane.YES_NO_OPTION, // El tipo de opción
+                javax.swing.JOptionPane.QUESTION_MESSAGE, // El tipo de mensaje (icono)
+                null, // No usamos un icono personalizado
+                opciones, // ¡Aquí pasamos nuestro array con los textos "Sí" y "No"!
+                opciones[0] // El botón que aparecerá seleccionado por defecto ("Sí")
+        );
+
+        if (respuesta == javax.swing.JOptionPane.YES_OPTION) {
+
+            if (clipMusica != null && clipMusica.isRunning()) {
+                clipMusica.stop();
+            }
+
+            VistaLogin vistaLogin = new VistaLogin();
+            vistaLogin.setVisible(true);
+
+            this.dispose();
         }
 
-   
-        VistaLogin vistaLogin = new VistaLogin();
-        vistaLogin.setVisible(true);
-
-                this.dispose();
-    }
-
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
-    
-    public void filtro() {
-        filtro = txtnombre.getText();
-        trsfiltro.setRowFilter(RowFilter.regexFilter(txtnombre.getText(),0));
-}
-    
-    
-    /**
-     * @param args the command line arguments
-     */
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSesion;
@@ -786,7 +1002,7 @@ String filtro;
     private javax.swing.JTextField txtpoblacion;
     // End of variables declaration//GEN-END:variables
 
-private void setPlaceholder(javax.swing.JTextField textField, String placeholder) {
+    private void setPlaceholder(javax.swing.JTextField textField, String placeholder) {
         textField.setText(placeholder);
         textField.setForeground(new java.awt.Color(153, 153, 153)); // Un gris un poco más oscuro
 
@@ -808,6 +1024,5 @@ private void setPlaceholder(javax.swing.JTextField textField, String placeholder
             }
         });
     }
-
 
 }
