@@ -48,7 +48,8 @@ public class VistaCuidades extends javax.swing.JFrame {
 
     public VistaCuidades() {
         initComponents();
-        setTitle("Lista de Paises");
+        // Título de la ventana corregido
+        setTitle("Lista de Ciudades");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setSize(1020, 600);
@@ -57,24 +58,35 @@ public class VistaCuidades extends javax.swing.JFrame {
         personalizarTablaEstiloFrutiger();
         establecerCursorPersonalizado();
         this.getRootPane().setDefaultButton(btnagregar);
+
+        // Listener de la tabla para rellenar campos
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
-                int filaSeleccionada = jTable1.getSelectedRow();
-                if (filaSeleccionada >= 0) {
-                    DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-                    txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
-                    txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
-                    txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
-                    txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
+                // Evita errores si no hay fila seleccionada
+                if (jTable1.getSelectedRow() != -1 && !event.getValueIsAdjusting()) {
+                    int filaSeleccionada = jTable1.convertRowIndexToModel(jTable1.getSelectedRow());
+                    if (filaSeleccionada >= 0) {
+                        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
-                    txtcodigo.setForeground(Color.black);
-                    txtnombre.setForeground(Color.black);
-                    txtcontinente.setForeground(Color.black);
-                    txtpoblacion.setForeground(Color.black);
+                        // Rellena los campos con los datos de la tabla (4 columnas)
+                        txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
+                        txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
+                        // txtcontinente ahora es usado para 'CountryCode'
+                        txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
+                        txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
+
+                        // Pone el texto en negro (quitando el placeholder gris)
+                        txtcodigo.setForeground(Color.black);
+                        txtnombre.setForeground(Color.black);
+                        txtcontinente.setForeground(Color.black);
+                        txtpoblacion.setForeground(Color.black);
+                    }
                 }
             }
         });
-        buscarPaises();
+
+        // Llama al método de búsqueda corregido
+        buscarCiudades();
     }
 
     private void establecerCursorPersonalizado() {
@@ -124,56 +136,60 @@ public class VistaCuidades extends javax.swing.JFrame {
      * Ejecuta una consulta SQL dinámica a la base de datos 'country' basándose
      * en los campos de texto y actualiza la jTable.
      */
-    private void buscarPaises() {
-        // Define las columnas para el modelo de la tabla
+    /**
+     * RENOMBRADO: de buscarPaises a buscarCiudades Ejecuta una consulta SQL
+     * dinámica a la base de datos 'city' basándose en los campos de texto y
+     * actualiza la jTable.
+     */
+    private void buscarCiudades() {
+        // Define las columnas para el modelo de la tabla (CORREGIDO)
         DefaultTableModel modelo = new DefaultTableModel(
-                new Object[]{"Codigo", "Nombre", "Continente", "Poblacion"}, 0
+                new Object[]{"ID", "Nombre", "Código Pais", "Poblacion"}, 0
         );
 
-        // 1. Prepara la consulta SQL base
-        // (Asegúrate que los nombres de columna sean 'Code', 'Name', etc. como en tu BD)
-        String sqlBase = "SELECT Code, Name, Continent, Population FROM country";
+        // 1. Prepara la consulta SQL base (CORREGIDO a la tabla 'city')
+        String sqlBase = "SELECT ID, Name, CountryCode, Population FROM city";
 
         // Listas para construir la consulta dinámica de forma segura
         ArrayList<String> conditions = new ArrayList<>();
         ArrayList<Object> params = new ArrayList<>();
 
         // 2. Recoge los textos de los campos
-        String codigo = txtcodigo.getText();
+        String id = txtcodigo.getText();
         String nombre = txtnombre.getText();
-        String continente = txtcontinente.getText();
+        // txtcontinente ahora se usa para CountryCode
+        String codigoPais = txtcontinente.getText();
         String poblacion = txtpoblacion.getText();
 
         try {
-            // 3. Añade condiciones SÓLO si el campo está lleno
+            // 3. Añade condiciones SÓLO si el campo está lleno y no es placeholder
 
-            // Si el campo 'codigo' no está vacío ni es el placeholder
-            if (!codigo.isEmpty() && !codigo.equals("Ingresa el codigo")) {
-                conditions.add("Code LIKE ?"); // Buscar por código
-                params.add(codigo + "%");      // Parámetro para 'Code'
+            // Si el campo 'id' no está vacío... (Búsqueda por ID exacto)
+            if (!id.isEmpty() && !id.equals("Ingresa el ID")) {
+                conditions.add("ID = ?");
+                params.add(Integer.parseInt(id)); // Parámetro numérico
             }
 
             // Si el campo 'nombre' no está vacío...
             if (!nombre.isEmpty() && !nombre.equals("Ingresa el nombre")) {
-                conditions.add("Name LIKE ?"); // Buscar por nombre
-                params.add("%" + nombre + "%");  // Parámetro para 'Name' (con comodines)
+                conditions.add("Name LIKE ?");
+                params.add("%" + nombre + "%");
             }
 
-            // Si el campo 'continente' no está vacío...
-            if (!continente.isEmpty() && !continente.equals("Ingresa el continente")) {
-                conditions.add("Continent LIKE ?"); // Buscar por continente
-                params.add("%" + continente + "%"); // Parámetro para 'Continent'
+            // Si el campo 'codigoPais' (txtcontinente) no está vacío...
+            if (!codigoPais.isEmpty() && !codigoPais.equals("Ingresa el código de pais")) {
+                conditions.add("CountryCode LIKE ?");
+                params.add(codigoPais + "%");
             }
 
             // Si el campo 'poblacion' no está vacío...
             if (!poblacion.isEmpty() && !poblacion.equals("Ingresa la población")) {
-                conditions.add("Population >= ?"); // Buscar población MAYOR O IGUAL que
-                params.add(Integer.parseInt(poblacion)); // Parámetro numérico
+                conditions.add("Population >= ?");
+                params.add(Integer.parseInt(poblacion));
             }
 
             // 4. Construye la consulta final
             if (!conditions.isEmpty()) {
-                // Si hay al menos una condición, une todas con " AND "
                 sqlBase += " WHERE " + String.join(" AND ", conditions);
             }
 
@@ -182,25 +198,21 @@ public class VistaCuidades extends javax.swing.JFrame {
             // 5. Ejecuta la consulta
             Connection miConexion = Conexion.getConnection();
 
-            // Usamos PreparedStatement para insertar los parámetros de forma segura
             try (PreparedStatement pstmt = miConexion.prepareStatement(sqlBase)) {
 
-                // Asigna los valores de la lista 'params' a la consulta
                 for (int i = 0; i < params.size(); i++) {
                     pstmt.setObject(i + 1, params.get(i));
                 }
 
-                // Ejecuta la consulta y obtén los resultados
                 try (ResultSet rs = pstmt.executeQuery()) {
-
                     System.out.println("Ejecutando consulta: " + pstmt.toString());
 
-                    // 6. Recorre los resultados y llena el modelo de la tabla
+                    // 6. Recorre los resultados (CORREGIDO para 'city')
                     while (rs.next()) {
                         modelo.addRow(new Object[]{
-                            rs.getString("Code"),
+                            rs.getInt("ID"),
                             rs.getString("Name"),
-                            rs.getString("Continent"),
+                            rs.getString("CountryCode"),
                             rs.getInt("Population")
                         });
                     }
@@ -208,13 +220,14 @@ public class VistaCuidades extends javax.swing.JFrame {
                     if (modelo.getRowCount() == 0) {
                         System.out.println("No se encontraron resultados para la búsqueda.");
                     } else {
-                        System.out.println(modelo.getRowCount() + " países cargados.");
+                        // Mensaje corregido
+                        System.out.println(modelo.getRowCount() + " ciudades cargadas.");
                     }
                 }
             }
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La población debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "El ID y la Población deben ser números válidos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -223,9 +236,8 @@ public class VistaCuidades extends javax.swing.JFrame {
             e.printStackTrace();
         }
 
-        // 7. Asigna el modelo (lleno o vacío) a la tabla
+        // 7. Asigna el modelo a la tabla
         jTable1.setModel(modelo);
-        // Vuelve a aplicar el estilo Frutiger a la tabla (importante)
         personalizarTablaEstiloFrutiger();
     }
 
@@ -243,7 +255,7 @@ public class VistaCuidades extends javax.swing.JFrame {
 
                 try (Statement stmt = miConexion.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
-                    System.out.println("--- Países de Sudamérica en la BD 'world' ---");
+                    System.out.println("--- Paises de Sudamérica en la BD 'world' ---");
 
                     // 3. Recorres los resultados
                     while (rs.next()) {
@@ -366,6 +378,7 @@ public class VistaCuidades extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(229, 246, 246));
+        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel1.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -467,20 +480,20 @@ public class VistaCuidades extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 50));
 
-        jLabel2.setText("Cuidades");
+        jLabel2.setText("Id");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, -1, -1));
 
         jLabel3.setText("Nombre");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 250, -1, -1));
 
-        jLabel4.setText("Continente");
+        jLabel4.setText("Codigo Pais");
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 310, -1, -1));
 
         jLabel5.setText("Población");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 370, -1, -1));
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
-        txtcodigo.setText("Ingresa el codigo");
+        txtcodigo.setText("Ingresa el ID");
         txtcodigo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcodigoFocusGained(evt);
@@ -502,7 +515,7 @@ public class VistaCuidades extends javax.swing.JFrame {
         getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 160, 40));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
-        txtcontinente.setText("Ingresa el continente");
+        txtcontinente.setText("Ingresa el código de pais");
         txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcontinenteFocusGained(evt);
@@ -562,12 +575,13 @@ public class VistaCuidades extends javax.swing.JFrame {
         });
         getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 360, 160, 40));
 
+        jTable1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Codigo", "Nombre", "Continente", "Poblacion"
+                "Id", "Nombre", "Codigo Pais", "Poblacion"
             }
         ) {
             Class[] types = new Class [] {
@@ -679,79 +693,72 @@ public class VistaCuidades extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
-        String codigo = txtcodigo.getText();
+
+        // 1. Obtener los datos de los campos de texto
+        // OMITIMOS el txtcodigo (ID) porque es auto-incremental
         String nombre = txtnombre.getText();
-        String continente = txtcontinente.getText();
+        String codigoPais = txtcontinente.getText(); // Usamos txtcontinente para CountryCode
         String poblacion = txtpoblacion.getText();
 
-        // 2. Validar que los campos no estén vacíos (con los placeholders)
-        if (codigo.isEmpty() || codigo.equals("Ingresa el codigo")
-                || nombre.isEmpty() || nombre.equals("Ingresa el nombre")
-                || continente.isEmpty() || continente.equals("Ingresa el continente")
+        // 2. Validar que los campos no estén vacíos
+        if (nombre.isEmpty() || nombre.equals("Ingresa el nombre")
+                || codigoPais.isEmpty() || codigoPais.equals("Ingresa el código de pais")
                 || poblacion.isEmpty() || poblacion.equals("Ingresa la población")) {
 
-            JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
-            return; // Salir si algo falta
+            JOptionPane.showMessageDialog(this, "Por favor, rellena Nombre, Código Pais y Población.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         // --- INICIA LA LÓGICA DE BASE DE DATOS ---
-        
         Connection miConexion = null;
         try {
-            // 3. Obtener la conexión
             miConexion = Conexion.getConnection();
-            
-            // 4. Preparar la consulta SQL (¡Usa los nombres de columna de tu BD!)
-            // (Asumo que son 'Code', 'Name', 'Continent', 'Population' de la BD 'world')
-            String sql = "INSERT INTO country (Code, Name, Continent, Population) VALUES (?, ?, ?, ?)";
-            
-            // 5. Usar PreparedStatement para insertar datos de forma segura
+
+            // 4. Preparar la consulta SQL (CORREGIDA para 'city')
+            // (El ID es auto-incremental, no se incluye en el INSERT)
+            String sql = "INSERT INTO city (Name, CountryCode, Population) VALUES (?, ?, ?)";
+
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-                
+
                 // 6. Asignar los valores a los '?'
-                pstmt.setString(1, codigo);      // El 'Code' (ej: "CHL")
-                pstmt.setString(2, nombre);      // El 'Name'
-                pstmt.setString(3, continente);  // El 'Continent'
-                pstmt.setInt(4, Integer.parseInt(poblacion)); // La 'Population'
-                
-                // 7. Ejecutar la inserción
+                pstmt.setString(1, nombre);
+                pstmt.setString(2, codigoPais);
+                pstmt.setInt(3, Integer.parseInt(poblacion));
+
                 int filasAfectadas = pstmt.executeUpdate();
-                
-                // 8. Verificar si la inserción fue exitosa
+
                 if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "¡País agregado exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                    
+                    JOptionPane.showMessageDialog(this, "¡Ciudad agregada exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
                     // 9. Actualizar la tabla visual
-                    // (Llama al método de búsqueda que hicimos antes para refrescar)
-                    buscarPaises(); 
-                    
+                    buscarCiudades();
+
                     // 10. Limpiar los campos de texto
-                    txtcodigo.setText("Ingresa el codigo");
+                    txtcodigo.setText("Ingresa el ID");
                     txtcodigo.setForeground(new Color(153, 153, 153));
                     txtnombre.setText("Ingresa el nombre");
                     txtnombre.setForeground(new Color(153, 153, 153));
-                    txtcontinente.setText("Ingresa el continente");
+                    
+                    txtcontinente.setText("Ingresa el código de pais");
                     txtcontinente.setForeground(new Color(153, 153, 153));
                     txtpoblacion.setText("Ingresa la población");
                     txtpoblacion.setForeground(new Color(153, 153, 153));
-                    
+
                 } else {
-                    JOptionPane.showMessageDialog(this, "No se pudo agregar el país.", "Error", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "No se pudo agregar la ciudad.", "Error", JOptionPane.WARNING_MESSAGE);
                 }
             }
 
         } catch (SQLException e) {
-            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
             JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         } catch (NumberFormatException e) {
-            // Error si la población no es un número
             JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            // Cualquier otro error (ej: conexión)
             JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+
     }//GEN-LAST:event_btnagregarActionPerformed
 
     private void txtcodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigoActionPerformed
@@ -760,16 +767,18 @@ public class VistaCuidades extends javax.swing.JFrame {
     }//GEN-LAST:event_txtcodigoActionPerformed
 
     private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
-        // TODO add your handling code here:
-        if (txtcodigo.getText().equals("Ingresa el codigo")) {
+
+        // Placeholder corregido
+        if (txtcodigo.getText().equals("Ingresa el ID")) {
             txtcodigo.setText("");
             txtcodigo.setForeground(new Color(0, 0, 0));
         }
+
     }//GEN-LAST:event_txtcodigoFocusGained
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
         if (txtcodigo.getText().equals("")) {
-            txtcodigo.setText("Ingresa el codigo");
+            txtcodigo.setText("Ingresa el ID");
             txtcodigo.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtcodigoFocusLost
@@ -796,7 +805,7 @@ public class VistaCuidades extends javax.swing.JFrame {
 
     private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
         // TODO add your handling code here:
-        if (txtcontinente.getText().equals("Ingresa el continente")) {
+        if (txtcontinente.getText().equals("Ingresa el código de pais")) {
             txtcontinente.setText("");
             txtcontinente.setForeground(new Color(0, 0, 0));
         }
@@ -804,10 +813,9 @@ public class VistaCuidades extends javax.swing.JFrame {
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
         if (txtcontinente.getText().equals("")) {
-            txtcontinente.setText("Ingresa el continente");
+            txtcontinente.setText("Ingresa el código de pais");
             txtcontinente.setForeground(new Color(153, 153, 153));
         }
-
     }//GEN-LAST:event_txtcontinenteFocusLost
 
     private void txtpoblacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusGained
@@ -852,33 +860,35 @@ public class VistaCuidades extends javax.swing.JFrame {
     }//GEN-LAST:event_txtnombreActionPerformed
 
     private void btnconsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnconsultarActionPerformed
-        buscarPaises();
+        buscarCiudades();
     }//GEN-LAST:event_btnconsultarActionPerformed
 
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
-int filaSeleccionada = jTable1.getSelectedRow();
+        int filaSeleccionada = jTable1.getSelectedRow();
 
-        // 2. Validar que haya una fila seleccionada
         if (filaSeleccionada < 0) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un país de la tabla para modificar.", "Fila no seleccionada", JOptionPane.WARNING_MESSAGE);
-            return; // Salir del método si no hay nada seleccionado
+            JOptionPane.showMessageDialog(this, "Debe seleccionar una ciudad de la tabla para modificar.", "Fila no seleccionada", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
-        // 3. Obtener el CÓDIGO ORIGINAL (PK) de la tabla
-        //    (Es más seguro que leerlo del textfield, por si el usuario lo cambió)
+        // Convertir el índice de la vista al índice del modelo (por si la tabla está ordenada)
+        int filaModelo = jTable1.convertRowIndexToModel(filaSeleccionada);
+
+        // 3. Obtener el ID ORIGINAL (PK) de la tabla
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-        String codigoOriginal = modelo.getValueAt(filaSeleccionada, 0).toString();
+        // El ID está en la columna 0
+        String idOriginal = modelo.getValueAt(filaModelo, 0).toString();
 
         // 4. Obtener los NUEVOS valores de los campos de texto
-        String codigoNuevo = txtcodigo.getText();
+        String idNuevo = txtcodigo.getText();
         String nombreNuevo = txtnombre.getText();
-        String continenteNuevo = txtcontinente.getText();
+        String codigoPaisNuevo = txtcontinente.getText(); // txtcontinente es CountryCode
         String poblacionNueva = txtpoblacion.getText();
 
-        // 5. Validar que los campos no estén vacíos (con los placeholders)
-        if (codigoNuevo.isEmpty() || codigoNuevo.equals("Ingresa el codigo")
+        // 5. Validar que los campos no estén vacíos
+        if (idNuevo.isEmpty() || idNuevo.equals("Ingresa el ID")
                 || nombreNuevo.isEmpty() || nombreNuevo.equals("Ingresa el nombre")
-                || continenteNuevo.isEmpty() || continenteNuevo.equals("Ingresa el continente")
+                || codigoPaisNuevo.isEmpty() || codigoPaisNuevo.equals("Ingresa el código de pais")
                 || poblacionNueva.isEmpty() || poblacionNueva.equals("Ingresa la población")) {
 
             JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
@@ -886,78 +896,69 @@ int filaSeleccionada = jTable1.getSelectedRow();
         }
 
         // --- INICIA LA LÓGICA DE BASE DE DATOS ---
-        
         Connection miConexion = null;
         try {
-            // 6. Obtener la conexión
             miConexion = Conexion.getConnection();
-            
-            // 7. Preparar la consulta SQL UPDATE
-            //    (Usamos los nombres de columna de tu BD: Code, Name, Continent, Population)
-            //    Esto te permite modificar todos los campos, incluso el código (PK)
-            String sql = "UPDATE country SET Code = ?, Name = ?, Continent = ?, Population = ? WHERE Code = ?";
-            
+
+            // 7. Preparar la consulta SQL UPDATE (CORREGIDA para 'city')
+            String sql = "UPDATE city SET ID = ?, Name = ?, CountryCode = ?, Population = ? WHERE ID = ?";
+
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-                
+
                 // 8. Asignar los NUEVOS valores (columnas SET)
-                pstmt.setString(1, codigoNuevo);
+                pstmt.setInt(1, Integer.parseInt(idNuevo));
                 pstmt.setString(2, nombreNuevo);
-                pstmt.setString(3, continenteNuevo);
+                pstmt.setString(3, codigoPaisNuevo);
                 pstmt.setInt(4, Integer.parseInt(poblacionNueva));
-                
-                // 9. Asignar el CÓDIGO ORIGINAL (columna WHERE)
-                //    Así sabe qué fila actualizar
-                pstmt.setString(5, codigoOriginal);
-                
-                // 10. Ejecutar la modificación
+
+                // 9. Asignar el ID ORIGINAL (columna WHERE)
+                pstmt.setInt(5, Integer.parseInt(idOriginal));
+
                 int filasAfectadas = pstmt.executeUpdate();
-                
-                // 11. Verificar el resultado
+
                 if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "¡País modificado exitosamente en la BD!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                    
-                    // 12. Refrescar la tabla (llamando al método que ya creamos)
-                    buscarPaises();
-                    
-                    // 13. Limpiar los campos (como en tu código original)
-                    txtcodigo.setText("Ingresa el codigo");
+                    JOptionPane.showMessageDialog(this, "¡Ciudad modificada exitosamente en la BD!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+                    // 12. Refrescar la tabla
+                    buscarCiudades();
+
+                    // 13. Limpiar los campos
+                    txtcodigo.setText("Ingresa el ID");
                     txtcodigo.setForeground(new Color(153, 153, 153));
                     txtnombre.setText("Ingresa el nombre");
                     txtnombre.setForeground(new Color(153, 153, 153));
-                    txtcontinente.setText("Ingresa el continente");
+                    txtcontinente.setText("Ingresa el código de pais");
                     txtcontinente.setForeground(new Color(153, 153, 153));
                     txtpoblacion.setText("Ingresa la población");
                     txtpoblacion.setForeground(new Color(153, 153, 153));
-                    
+
                 } else {
-                    JOptionPane.showMessageDialog(this, "No se encontró el país para modificar (pudo ser borrado por otro usuario).", "Error", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "No se encontró la ciudad para modificar.", "Error", JOptionPane.WARNING_MESSAGE);
                 }
             }
 
         } catch (SQLException e) {
-            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
             String mensajeError = e.getMessage();
             if (mensajeError.contains("Duplicate entry")) {
-                JOptionPane.showMessageDialog(this, "Error: El nuevo código '" + codigoNuevo + "' ya existe en la BD.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error: El nuevo ID '" + idNuevo + "' ya existe en la BD.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error al modificar en la base de datos: " + mensajeError, "Error SQL", JOptionPane.ERROR_MESSAGE);
             }
             e.printStackTrace();
         } catch (NumberFormatException e) {
-            // Error si la población no es un número
-            JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "El ID y la Población deben ser números enteros válidos.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            // Cualquier otro error (ej: conexión)
             JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-    
+
+
     }//GEN-LAST:event_btnmodificarActionPerformed
 
     private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
-        String texto = txtcodigo.getText();
-        if (texto.length() >= 3) {
-            evt.consume();
+        char n = evt.getKeyChar();
+        if (n < '0' || n > '9') {
+            evt.consume(); // Ignora la tecla si no es un número
         }
     }//GEN-LAST:event_txtcodigoKeyTyped
 
@@ -990,14 +991,14 @@ int filaSeleccionada = jTable1.getSelectedRow();
 
         // 2. Mostrar un cuadro de diálogo con las opciones personalizadas
         int respuesta = javax.swing.JOptionPane.showOptionDialog(
-            this, // El componente padre (esta misma ventana)
-            "¿Estás seguro de que deseas cerrar la sesión?", // El mensaje a mostrar
-            "Confirmar Cierre de Sesión", // El título de la ventana
-            javax.swing.JOptionPane.YES_NO_OPTION, // El tipo de opción
-            javax.swing.JOptionPane.QUESTION_MESSAGE, // El tipo de mensaje (icono)
-            null, // No usamos un icono personalizado
-            opciones, // ¡Aquí pasamos nuestro array con los textos "Sí" y "No"!
-            opciones[0] // El botón que aparecerá seleccionado por defecto ("Sí")
+                this, // El componente padre (esta misma ventana)
+                "¿Estás seguro de que deseas cerrar la sesión?", // El mensaje a mostrar
+                "Confirmar Cierre de Sesión", // El título de la ventana
+                javax.swing.JOptionPane.YES_NO_OPTION, // El tipo de opción
+                javax.swing.JOptionPane.QUESTION_MESSAGE, // El tipo de mensaje (icono)
+                null, // No usamos un icono personalizado
+                opciones, // ¡Aquí pasamos nuestro array con los textos "Sí" y "No"!
+                opciones[0] // El botón que aparecerá seleccionado por defecto ("Sí")
         );
 
         if (respuesta == javax.swing.JOptionPane.YES_OPTION) {
