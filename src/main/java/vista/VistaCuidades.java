@@ -38,7 +38,7 @@ import java.util.ArrayList;
  *
  * @author Mouli
  */
-public class VistaPaises extends javax.swing.JFrame {
+public class VistaCuidades extends javax.swing.JFrame {
 
     /**
      * Creates new form VistaPaises
@@ -46,7 +46,7 @@ public class VistaPaises extends javax.swing.JFrame {
     int xMouse, yMouse;
     private int papulandiaClickCount = 0;
 
-    public VistaPaises() {
+    public VistaCuidades() {
         initComponents();
         setTitle("Lista de Paises");
         this.setLocationRelativeTo(null);
@@ -333,7 +333,6 @@ public class VistaPaises extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel9 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         minBtn = new javax.swing.JButton();
         extBtn = new javax.swing.JButton();
@@ -365,10 +364,6 @@ public class VistaPaises extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Paises.png"))); // NOI18N
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 380, -1));
 
         jPanel1.setBackground(new java.awt.Color(229, 246, 246));
         jPanel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -429,11 +424,6 @@ public class VistaPaises extends javax.swing.JFrame {
         });
 
         btnCuidades.setText("Cuidades");
-        btnCuidades.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCuidadesActionPerformed(evt);
-            }
-        });
 
         btnIdiomas.setText("Idiomas");
         btnIdiomas.addActionListener(new java.awt.event.ActionListener() {
@@ -477,7 +467,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 50));
 
-        jLabel2.setText("Codigo");
+        jLabel2.setText("Cuidades");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, -1, -1));
 
         jLabel3.setText("Nombre");
@@ -705,35 +695,36 @@ public class VistaPaises extends javax.swing.JFrame {
         }
 
         // --- INICIA LA LÓGICA DE BASE DE DATOS ---
+        
         Connection miConexion = null;
         try {
             // 3. Obtener la conexión
             miConexion = Conexion.getConnection();
-
+            
             // 4. Preparar la consulta SQL (¡Usa los nombres de columna de tu BD!)
             // (Asumo que son 'Code', 'Name', 'Continent', 'Population' de la BD 'world')
             String sql = "INSERT INTO country (Code, Name, Continent, Population) VALUES (?, ?, ?, ?)";
-
+            
             // 5. Usar PreparedStatement para insertar datos de forma segura
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-
+                
                 // 6. Asignar los valores a los '?'
                 pstmt.setString(1, codigo);      // El 'Code' (ej: "CHL")
                 pstmt.setString(2, nombre);      // El 'Name'
                 pstmt.setString(3, continente);  // El 'Continent'
                 pstmt.setInt(4, Integer.parseInt(poblacion)); // La 'Population'
-
+                
                 // 7. Ejecutar la inserción
                 int filasAfectadas = pstmt.executeUpdate();
-
+                
                 // 8. Verificar si la inserción fue exitosa
                 if (filasAfectadas > 0) {
                     JOptionPane.showMessageDialog(this, "¡País agregado exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
+                    
                     // 9. Actualizar la tabla visual
                     // (Llama al método de búsqueda que hicimos antes para refrescar)
-                    buscarPaises();
-
+                    buscarPaises(); 
+                    
                     // 10. Limpiar los campos de texto
                     txtcodigo.setText("Ingresa el codigo");
                     txtcodigo.setForeground(new Color(153, 153, 153));
@@ -743,7 +734,7 @@ public class VistaPaises extends javax.swing.JFrame {
                     txtcontinente.setForeground(new Color(153, 153, 153));
                     txtpoblacion.setText("Ingresa la población");
                     txtpoblacion.setForeground(new Color(153, 153, 153));
-
+                    
                 } else {
                     JOptionPane.showMessageDialog(this, "No se pudo agregar el país.", "Error", JOptionPane.WARNING_MESSAGE);
                 }
@@ -865,7 +856,7 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_btnconsultarActionPerformed
 
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
-        int filaSeleccionada = jTable1.getSelectedRow();
+int filaSeleccionada = jTable1.getSelectedRow();
 
         // 2. Validar que haya una fila seleccionada
         if (filaSeleccionada < 0) {
@@ -895,38 +886,39 @@ public class VistaPaises extends javax.swing.JFrame {
         }
 
         // --- INICIA LA LÓGICA DE BASE DE DATOS ---
+        
         Connection miConexion = null;
         try {
             // 6. Obtener la conexión
             miConexion = Conexion.getConnection();
-
+            
             // 7. Preparar la consulta SQL UPDATE
             //    (Usamos los nombres de columna de tu BD: Code, Name, Continent, Population)
             //    Esto te permite modificar todos los campos, incluso el código (PK)
             String sql = "UPDATE country SET Code = ?, Name = ?, Continent = ?, Population = ? WHERE Code = ?";
-
+            
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-
+                
                 // 8. Asignar los NUEVOS valores (columnas SET)
                 pstmt.setString(1, codigoNuevo);
                 pstmt.setString(2, nombreNuevo);
                 pstmt.setString(3, continenteNuevo);
                 pstmt.setInt(4, Integer.parseInt(poblacionNueva));
-
+                
                 // 9. Asignar el CÓDIGO ORIGINAL (columna WHERE)
                 //    Así sabe qué fila actualizar
                 pstmt.setString(5, codigoOriginal);
-
+                
                 // 10. Ejecutar la modificación
                 int filasAfectadas = pstmt.executeUpdate();
-
+                
                 // 11. Verificar el resultado
                 if (filasAfectadas > 0) {
                     JOptionPane.showMessageDialog(this, "¡País modificado exitosamente en la BD!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
+                    
                     // 12. Refrescar la tabla (llamando al método que ya creamos)
                     buscarPaises();
-
+                    
                     // 13. Limpiar los campos (como en tu código original)
                     txtcodigo.setText("Ingresa el codigo");
                     txtcodigo.setForeground(new Color(153, 153, 153));
@@ -936,7 +928,7 @@ public class VistaPaises extends javax.swing.JFrame {
                     txtcontinente.setForeground(new Color(153, 153, 153));
                     txtpoblacion.setText("Ingresa la población");
                     txtpoblacion.setForeground(new Color(153, 153, 153));
-
+                    
                 } else {
                     JOptionPane.showMessageDialog(this, "No se encontró el país para modificar (pudo ser borrado por otro usuario).", "Error", JOptionPane.WARNING_MESSAGE);
                 }
@@ -959,7 +951,7 @@ public class VistaPaises extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-
+    
     }//GEN-LAST:event_btnmodificarActionPerformed
 
     private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
@@ -998,14 +990,14 @@ public class VistaPaises extends javax.swing.JFrame {
 
         // 2. Mostrar un cuadro de diálogo con las opciones personalizadas
         int respuesta = javax.swing.JOptionPane.showOptionDialog(
-                this, // El componente padre (esta misma ventana)
-                "¿Estás seguro de que deseas cerrar la sesión?", // El mensaje a mostrar
-                "Confirmar Cierre de Sesión", // El título de la ventana
-                javax.swing.JOptionPane.YES_NO_OPTION, // El tipo de opción
-                javax.swing.JOptionPane.QUESTION_MESSAGE, // El tipo de mensaje (icono)
-                null, // No usamos un icono personalizado
-                opciones, // ¡Aquí pasamos nuestro array con los textos "Sí" y "No"!
-                opciones[0] // El botón que aparecerá seleccionado por defecto ("Sí")
+            this, // El componente padre (esta misma ventana)
+            "¿Estás seguro de que deseas cerrar la sesión?", // El mensaje a mostrar
+            "Confirmar Cierre de Sesión", // El título de la ventana
+            javax.swing.JOptionPane.YES_NO_OPTION, // El tipo de opción
+            javax.swing.JOptionPane.QUESTION_MESSAGE, // El tipo de mensaje (icono)
+            null, // No usamos un icono personalizado
+            opciones, // ¡Aquí pasamos nuestro array con los textos "Sí" y "No"!
+            opciones[0] // El botón que aparecerá seleccionado por defecto ("Sí")
         );
 
         if (respuesta == javax.swing.JOptionPane.YES_OPTION) {
@@ -1044,18 +1036,14 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_btnIdiomasActionPerformed
 
     private void btnContinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinenteActionPerformed
-      // TODO add your handling code here:
-    }//GEN-LAST:event_btnContinenteActionPerformed
-
-    private void btnCuidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCuidadesActionPerformed
-        VistaCuidades vistaCiudades = new VistaCuidades();
+        VistaPaises vistaPaises = new VistaPaises();
 
         // 2. Hacerla visible
-        vistaCiudades.setVisible(true);
+        vistaPaises.setVisible(true);
 
         // 3. (Importante) Cerrar esta ventana actual (VistaPaises)
         this.dispose();         // TODO add your handling code here:
-    }//GEN-LAST:event_btnCuidadesActionPerformed
+    }//GEN-LAST:event_btnContinenteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1076,7 +1064,6 @@ public class VistaPaises extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

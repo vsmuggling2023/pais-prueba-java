@@ -38,7 +38,7 @@ import java.util.ArrayList;
  *
  * @author Mouli
  */
-public class VistaPaises extends javax.swing.JFrame {
+public class VistaIdiomas extends javax.swing.JFrame {
 
     /**
      * Creates new form VistaPaises
@@ -46,7 +46,7 @@ public class VistaPaises extends javax.swing.JFrame {
     int xMouse, yMouse;
     private int papulandiaClickCount = 0;
 
-    public VistaPaises() {
+    public VistaIdiomas() {
         initComponents();
         setTitle("Lista de Paises");
         this.setLocationRelativeTo(null);
@@ -333,7 +333,6 @@ public class VistaPaises extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel9 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         minBtn = new javax.swing.JButton();
         extBtn = new javax.swing.JButton();
@@ -365,10 +364,6 @@ public class VistaPaises extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Paises.png"))); // NOI18N
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 380, -1));
 
         jPanel1.setBackground(new java.awt.Color(229, 246, 246));
         jPanel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -477,7 +472,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 50));
 
-        jLabel2.setText("Codigo");
+        jLabel2.setText("Idioma");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, -1, -1));
 
         jLabel3.setText("Nombre");
@@ -1034,17 +1029,17 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_minBtnActionPerformed
 
     private void btnIdiomasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIdiomasActionPerformed
-        VistaIdiomas vistaIdiomas = new VistaIdiomas();
-
-        // 2. Hacerla visible
-        vistaIdiomas.setVisible(true);
-
-        // 3. (Importante) Cerrar esta ventana actual (VistaPaises)
-        this.dispose();         // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_btnIdiomasActionPerformed
 
     private void btnContinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinenteActionPerformed
-      // TODO add your handling code here:
+        VistaPaises vistaPaises = new VistaPaises();
+
+        // 2. Hacerla visible
+        vistaPaises.setVisible(true);
+
+        // 3. (Importante) Cerrar esta ventana actual (VistaPaises)
+        this.dispose();    // TODO add your handling code here:
     }//GEN-LAST:event_btnContinenteActionPerformed
 
     private void btnCuidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCuidadesActionPerformed
@@ -1076,7 +1071,6 @@ public class VistaPaises extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
