@@ -72,8 +72,8 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnCerrarSesion" min="-2" pref="122" max="-2" attributes="0"/>
-                  <EmptySpace pref="367" max="32767" attributes="0"/>
-                  <Component id="btnContinente" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="389" max="32767" attributes="0"/>
+                  <Component id="btnPaises" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                   <Component id="btnCuidades" min="-2" pref="99" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
@@ -90,7 +90,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="btnContinente" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnPaises" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnCuidades" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="btnIdiomas" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -158,12 +158,12 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCerrarSesionActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="btnContinente">
+        <Component class="javax.swing.JButton" name="btnPaises">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Continentes"/>
+            <Property name="text" type="java.lang.String" value="Paises"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnContinenteActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPaisesActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnCuidades">

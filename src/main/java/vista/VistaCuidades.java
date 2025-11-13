@@ -337,7 +337,7 @@ public class VistaCuidades extends javax.swing.JFrame {
         minBtn = new javax.swing.JButton();
         extBtn = new javax.swing.JButton();
         btnCerrarSesion = new javax.swing.JButton();
-        btnContinente = new javax.swing.JButton();
+        btnPaises = new javax.swing.JButton();
         btnCuidades = new javax.swing.JButton();
         btnIdiomas = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -416,10 +416,10 @@ public class VistaCuidades extends javax.swing.JFrame {
             }
         });
 
-        btnContinente.setText("Continentes");
-        btnContinente.addActionListener(new java.awt.event.ActionListener() {
+        btnPaises.setText("Paises");
+        btnPaises.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnContinenteActionPerformed(evt);
+                btnPaisesActionPerformed(evt);
             }
         });
 
@@ -439,8 +439,8 @@ public class VistaCuidades extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnCerrarSesion, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 367, Short.MAX_VALUE)
-                .addComponent(btnContinente)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 389, Short.MAX_VALUE)
+                .addComponent(btnPaises)
                 .addGap(50, 50, 50)
                 .addComponent(btnCuidades, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(39, 39, 39)
@@ -455,7 +455,7 @@ public class VistaCuidades extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnContinente)
+                        .addComponent(btnPaises)
                         .addComponent(btnCuidades)
                         .addComponent(btnIdiomas))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -1035,7 +1035,7 @@ int filaSeleccionada = jTable1.getSelectedRow();
         this.dispose();         // TODO add your handling code here:
     }//GEN-LAST:event_btnIdiomasActionPerformed
 
-    private void btnContinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinenteActionPerformed
+    private void btnPaisesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPaisesActionPerformed
         VistaPaises vistaPaises = new VistaPaises();
 
         // 2. Hacerla visible
@@ -1043,14 +1043,14 @@ int filaSeleccionada = jTable1.getSelectedRow();
 
         // 3. (Importante) Cerrar esta ventana actual (VistaPaises)
         this.dispose();         // TODO add your handling code here:
-    }//GEN-LAST:event_btnContinenteActionPerformed
+    }//GEN-LAST:event_btnPaisesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSesion;
-    private javax.swing.JButton btnContinente;
     private javax.swing.JButton btnCuidades;
     private javax.swing.JButton btnIdiomas;
+    private javax.swing.JButton btnPaises;
     private javax.swing.JButton btnagregar;
     private javax.swing.JButton btnconsultar;
     private javax.swing.JButton btnmodificar;
