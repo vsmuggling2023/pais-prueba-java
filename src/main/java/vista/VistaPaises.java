@@ -17,7 +17,12 @@ import javax.swing.table.JTableHeader;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -48,6 +53,7 @@ public class VistaPaises extends javax.swing.JFrame {
 
     public VistaPaises() {
         initComponents();
+        jTable1.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         setTitle("Lista de Paises");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
@@ -856,6 +862,141 @@ public class VistaPaises extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
+    // Agregar este nuevo método a la clase VistaPaises.java
+
+    private void compararPaises(int[] filasSeleccionadas) {
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        List<String> codigos = new ArrayList<>();
+
+        // 1. Recoger los códigos de los países seleccionados
+        for (int fila : filasSeleccionadas) {
+            // Usar .trim() para seguridad
+            codigos.add(modelo.getValueAt(fila, 0).toString().trim());
+        }
+
+        Connection miConexion = null;
+        try {
+            miConexion = conn.Conexion.getConnection();
+
+            // 2. Construir la consulta con 10 campos comparables + Nombre y Código
+            String placeholders = String.join(",", Collections.nCopies(codigos.size(), "?"));
+
+            // --- SQL ACTUALIZADO para las 10 métricas del documento ---
+            String sql = "SELECT "
+                    + "T1.Name, T1.Continent, T1.Region, T1.SurfaceArea, T1.IndepYear, "
+                    + "T1.Population, T1.LifeExpectancy, T1.GNP, T1.GovernmentForm, "
+                    + "T1.HeadOfState, T2.Name AS CapitalName "
+                    + "FROM country T1 "
+                    + "LEFT JOIN city T2 ON T1.Capital = T2.ID "
+                    + // Para obtener el nombre de la Capital
+                    "WHERE T1.Code IN (" + placeholders + ") ORDER BY T1.Name";
+            // -----------------------------------------------------------
+
+            try (PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
+                // Asignar los códigos a los placeholders
+                for (int i = 0; i < codigos.size(); i++) {
+                    pstmt.setString(i + 1, codigos.get(i));
+                }
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+
+                    StringBuilder tableHtml = new StringBuilder();
+                    // Aumentar un poco el ancho para las 10 métricas
+                    tableHtml.append("<html><body style='width: 650px; font-family: sans-serif;'>");
+                    tableHtml.append("<h2>Comparación de Países Seleccionados</h2>");
+                    tableHtml.append("<table border='1' style='width: 100%; border-collapse: collapse; text-align: right;'>");
+
+                    // Mapeo de datos: Clave=Métrica, Valor=Lista de valores por país
+                    Map<String, List<String>> resultados = new LinkedHashMap<>();
+                    List<String> nombresPaises = new ArrayList<>();
+
+                    // 3. Recoger los resultados y organizar por métrica (10 MÉTTRICAS)
+                    while (rs.next()) {
+                        nombresPaises.add(rs.getString("Name"));
+
+                        // 1. Población
+                        resultados.computeIfAbsent("Población", k -> new ArrayList<>()).add(String.format("%,d", rs.getInt("Population")));
+
+                        // 2. Superficie
+                        resultados.computeIfAbsent("Superficie (km²)", k -> new ArrayList<>()).add(String.format("%,.2f", rs.getDouble("SurfaceArea")));
+
+                        // 3. PNB
+                        resultados.computeIfAbsent("PNB", k -> new ArrayList<>()).add(String.format("%,.2f", rs.getDouble("GNP")));
+
+                        // 4. Expectativa de Vida (Manejo de NULLs)
+                        double lifeExpectancyRaw = rs.getDouble("LifeExpectancy");
+                        String lifeExpectancy = rs.wasNull() ? "N/A" : String.format("%,.1f", lifeExpectancyRaw);
+                        resultados.computeIfAbsent("Expectativa de Vida (años)", k -> new ArrayList<>()).add(lifeExpectancy);
+
+                        // 5. Continente
+                        resultados.computeIfAbsent("Continente", k -> new ArrayList<>()).add(rs.getString("Continent"));
+
+                        // 6. Región
+                        resultados.computeIfAbsent("Región", k -> new ArrayList<>()).add(rs.getString("Region"));
+
+                        // 7. Año de Independencia (Manejo de NULLs)
+                        Object indepYearObj = rs.getObject("IndepYear");
+                        String indepYear = (indepYearObj != null) ? indepYearObj.toString() : "N/A";
+                        resultados.computeIfAbsent("Año de Independencia", k -> new ArrayList<>()).add(indepYear);
+
+                        // 8. Forma de Gobierno
+                        resultados.computeIfAbsent("Forma de Gobierno", k -> new ArrayList<>()).add(rs.getString("GovernmentForm"));
+
+                        // 9. Jefe de Estado
+                        String headOfState = rs.getString("HeadOfState");
+                        resultados.computeIfAbsent("Jefe de Estado", k -> new ArrayList<>()).add(headOfState != null && !headOfState.trim().isEmpty() ? headOfState : "N/A");
+
+                        // 10. Capital
+                        String capitalName = rs.getString("CapitalName");
+                        resultados.computeIfAbsent("Capital", k -> new ArrayList<>()).add(capitalName != null ? capitalName : "N/A");
+                    }
+
+                    // 4. Generar encabezados de tabla (Nombres de Países)
+                    tableHtml.append("<tr><th style='text-align: left; background-color: #e0f7fa;'>Métrica</th>");
+                    for (String nombrePais : nombresPaises) {
+                        tableHtml.append("<th style='background-color: #f0f0f0; padding: 5px;'>").append(nombrePais).append("</th>");
+                    }
+                    tableHtml.append("</tr>");
+
+                    // 5. Generar filas de datos (LISTA COMPLETA DE 10 MÉTRICAS)
+                    List<String> metricas = Arrays.asList(
+                            "Población",
+                            "Superficie (km²)",
+                            "PNB",
+                            "Expectativa de Vida (años)",
+                            "Continente",
+                            "Región",
+                            "Año de Independencia",
+                            "Forma de Gobierno",
+                            "Jefe de Estado",
+                            "Capital"
+                    );
+
+                    for (String metrica : metricas) {
+                        tableHtml.append("<tr><td style='text-align: left; background-color: #f9f9f9;'><b>").append(metrica).append("</b></td>");
+                        List<String> valores = resultados.getOrDefault(metrica, Collections.emptyList());
+                        for (String valor : valores) {
+                            tableHtml.append("<td style='background-color: #ffffff; color: #333; padding: 5px;'>").append(valor).append("</td>");
+                        }
+                        tableHtml.append("</tr>");
+                    }
+
+                    tableHtml.append("</table></body></html>");
+
+                    // Mostrar la mini ventana de comparación
+                    JOptionPane.showMessageDialog(this, tableHtml.toString(), "Comparación de Países", JOptionPane.INFORMATION_MESSAGE);
+
+                }
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al realizar la comparación en la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado al preparar la comparación: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
     private void txtcodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigoActionPerformed
         // TODO add your handling code here:
 
@@ -1151,8 +1292,21 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCuidadesActionPerformed
 
     private void btnVerDetallesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerDetallesActionPerformed
-        // TODO add your handling code here:
-        mostrarDetallesPaisSeleccionado();
+        int[] selectedRows = jTable1.getSelectedRows();
+
+        if (selectedRows.length == 1) {
+            // Comportamiento original: Mostrar detalles individuales
+            mostrarDetallesPaisSeleccionado();
+        } else if (selectedRows.length >= 2 && selectedRows.length <= 3) {
+            // Nuevo comportamiento: Comparar 2 o 3 países
+            compararPaises(selectedRows);
+        } else {
+            // Advertencia si la selección no es válida
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar entre 2 y 3 países para realizar una comparación.",
+                    "Selección Inválida",
+                    JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btnVerDetallesActionPerformed
 
 
