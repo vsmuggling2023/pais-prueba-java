@@ -333,6 +333,7 @@ public class VistaPaises extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnVerDetalles = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         minBtn = new javax.swing.JButton();
@@ -366,11 +367,20 @@ public class VistaPaises extends javax.swing.JFrame {
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        btnVerDetalles.setText("Detalles");
+        btnVerDetalles.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVerDetallesActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnVerDetalles, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 90, -1, -1));
+
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Paises.png"))); // NOI18N
         getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 380, -1));
 
         jPanel1.setBackground(new java.awt.Color(229, 246, 246));
+        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel1.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -572,6 +582,7 @@ public class VistaPaises extends javax.swing.JFrame {
         });
         getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 360, 160, 40));
 
+        jTable1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -599,7 +610,7 @@ public class VistaPaises extends javax.swing.JFrame {
         jTable1.setInheritsPopupMenu(true);
         jScrollPane1.setViewportView(jTable1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 80, 560, 399));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 90, 560, 399));
 
         btnagregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Agregar.png"))); // NOI18N
         btnagregar.setBorder(null);
@@ -762,7 +773,89 @@ public class VistaPaises extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }//GEN-LAST:event_btnagregarActionPerformed
+    private void mostrarDetallesPaisSeleccionado() {
+        int filaSeleccionada = jTable1.getSelectedRow();
 
+        if (filaSeleccionada < 0) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un país de la tabla para ver sus detalles.", "País no seleccionado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Obtener el código de país (PK) de la fila seleccionada
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        // *** EL AJUSTE CRÍTICO: .trim() para eliminar espacios en blanco y asegurar la coincidencia SQL ***
+        String codigoPais = modelo.getValueAt(filaSeleccionada, 0).toString().trim();
+
+        Connection miConexion = null;
+        try {
+            miConexion = conn.Conexion.getConnection();
+
+            // Consulta SQL para obtener todos los detalles del país
+            String sql = "SELECT "
+                    + "T1.Name, T1.Continent, T1.Region, T1.SurfaceArea, T1.IndepYear, "
+                    + "T1.Population, T1.LifeExpectancy, T1.GNP, T1.GovernmentForm, "
+                    + "T1.HeadOfState, T2.Name AS CapitalName "
+                    + "FROM country T1 "
+                    + "LEFT JOIN city T2 ON T1.Capital = T2.ID " // Unir con City para obtener el nombre de la Capital
+                    + "WHERE T1.Code = ?";
+
+            try (PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
+                pstmt.setString(1, codigoPais);
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        // 1. Recolección de datos
+                        String nombre = rs.getString("Name");
+                        String continente = rs.getString("Continent");
+                        String region = rs.getString("Region");
+                        double superficie = rs.getDouble("SurfaceArea");
+
+                        // Manejar IndepYear que puede ser NULL en la BD
+                        Object indepYearObj = rs.getObject("IndepYear");
+                        String indepYear = (indepYearObj != null) ? indepYearObj.toString() : "N/A";
+
+                        int poblacion = rs.getInt("Population");
+                        // Manejar LifeExpectancy que puede ser NULL
+                        double lifeExpectancyRaw = rs.getDouble("LifeExpectancy");
+                        String lifeExpectancy = rs.wasNull() ? "N/A" : String.format("%,.1f", lifeExpectancyRaw) + " años";
+
+                        double gnp = rs.getDouble("GNP");
+                        String formaGobierno = rs.getString("GovernmentForm");
+                        String jefeEstado = rs.getString("HeadOfState");
+                        String capital = rs.getString("CapitalName");
+
+                        // 2. Formato del mensaje en HTML para una mejor presentación (LA MINI VENTANA)
+                        String detalles = "<html><body style='width: 300px; font-family: sans-serif;'>"
+                                + "<h2>Detalles Completos de " + nombre + " (" + codigoPais + ")</h2>"
+                                + "<hr style='border: 1px solid #ccc;'>"
+                                + "<p><b>Continente:</b> " + continente + "</p>"
+                                + "<p><b>Región:</b> " + region + "</p>"
+                                + "<p><b>Superficie:</b> " + String.format("%,.2f", superficie) + " km²</p>"
+                                + "<p><b>Año de Independencia:</b> " + indepYear + "</p>"
+                                + "<p><b>Población:</b> " + String.format("%,d", poblacion) + "</p>"
+                                + "<p><b>Expectativa de Vida:</b> " + lifeExpectancy + "</p>"
+                                + "<p><b>Producto Nacional Bruto (GNP):</b> " + String.format("%,.2f", gnp) + "</p>"
+                                + "<p><b>Forma de Gobierno:</b> " + formaGobierno + "</p>"
+                                + "<p><b>Jefe de Estado:</b> " + jefeEstado + "</p>"
+                                + "<p><b>Capital:</b> " + (capital != null ? capital : "N/A") + "</p>"
+                                + "</body></html>";
+
+                        // 3. Mostrar el diálogo (la mini ventana)
+                        JOptionPane.showMessageDialog(this, detalles, "Información Detallada del País", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "No se encontraron detalles completos para el país seleccionado en la base de datos.", "Error de Datos", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado al cargar detalles: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
     private void txtcodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigoActionPerformed
         // TODO add your handling code here:
 
@@ -1044,7 +1137,7 @@ public class VistaPaises extends javax.swing.JFrame {
     }//GEN-LAST:event_btnIdiomasActionPerformed
 
     private void btnPaisesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPaisesActionPerformed
-      // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_btnPaisesActionPerformed
 
     private void btnCuidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCuidadesActionPerformed
@@ -1057,12 +1150,18 @@ public class VistaPaises extends javax.swing.JFrame {
         this.dispose();         // TODO add your handling code here:
     }//GEN-LAST:event_btnCuidadesActionPerformed
 
+    private void btnVerDetallesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerDetallesActionPerformed
+        // TODO add your handling code here:
+        mostrarDetallesPaisSeleccionado();
+    }//GEN-LAST:event_btnVerDetallesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSesion;
     private javax.swing.JButton btnCuidades;
     private javax.swing.JButton btnIdiomas;
     private javax.swing.JButton btnPaises;
+    private javax.swing.JButton btnVerDetalles;
     private javax.swing.JButton btnagregar;
     private javax.swing.JButton btnconsultar;
     private javax.swing.JButton btnmodificar;

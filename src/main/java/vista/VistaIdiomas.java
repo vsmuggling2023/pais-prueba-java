@@ -57,6 +57,10 @@ public class VistaIdiomas extends javax.swing.JFrame {
         personalizarTablaEstiloFrutiger();
         establecerCursorPersonalizado();
         this.getRootPane().setDefaultButton(btnagregar);
+        setPlaceholder(txtcodigo, "Ingresa el código de país");
+        setPlaceholder(txtnombre, "Ingresa el idioma");
+        setPlaceholder(txtcontinente, "Ingresa T o F (Oficial)");
+        setPlaceholder(txtpoblacion, "Ingresa el porcentaje");
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
                 int filaSeleccionada = jTable1.getSelectedRow();
@@ -74,7 +78,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
                 }
             }
         });
-        buscarPaises();
+        buscarIdiomas();
     }
 
     private void establecerCursorPersonalizado() {
@@ -124,60 +128,62 @@ public class VistaIdiomas extends javax.swing.JFrame {
      * Ejecuta una consulta SQL dinámica a la base de datos 'country' basándose
      * en los campos de texto y actualiza la jTable.
      */
-    private void buscarPaises() {
+    private void buscarIdiomas() {
         // Define las columnas para el modelo de la tabla
         DefaultTableModel modelo = new DefaultTableModel(
-                new Object[]{"Codigo", "Nombre", "Continente", "Poblacion"}, 0
+                new Object[]{"CodigoPais", "Idioma", "EsOficial", "Porcentaje"}, 0 // COLUMNAS ACTUALIZADAS
         );
 
         // 1. Prepara la consulta SQL base
-        // (Asegúrate que los nombres de columna sean 'Code', 'Name', etc. como en tu BD)
-        String sqlBase = "SELECT Code, Name, Continent, Population FROM country";
+        String sqlBase = "SELECT CountryCode, Language, IsOfficial, Percentage FROM countrylanguage"; // TABLA Y COLUMNAS ACTUALIZADAS
 
         // Listas para construir la consulta dinámica de forma segura
         ArrayList<String> conditions = new ArrayList<>();
         ArrayList<Object> params = new ArrayList<>();
 
-        // 2. Recoge los textos de los campos
-        String codigo = txtcodigo.getText();
-        String nombre = txtnombre.getText();
-        String continente = txtcontinente.getText();
-        String poblacion = txtpoblacion.getText();
+        // 2. Recoge los textos de los campos y los mapea a las columnas de countrylanguage
+        String codigo = txtcodigo.getText();     // Country Code
+        String nombre = txtnombre.getText();     // Language
+        String continente = txtcontinente.getText(); // IsOfficial ('T'/'F')
+        String poblacion = txtpoblacion.getText();   // Percentage (Decimal)
 
         try {
             // 3. Añade condiciones SÓLO si el campo está lleno
 
-            // Si el campo 'codigo' no está vacío ni es el placeholder
-            if (!codigo.isEmpty() && !codigo.equals("Ingresa el codigo")) {
-                conditions.add("Code LIKE ?"); // Buscar por código
-                params.add(codigo + "%");      // Parámetro para 'Code'
+            // Country Code (txtcodigo)
+            if (!codigo.isEmpty() && !codigo.equals("Ingresa el código de país")) {
+                conditions.add("CountryCode LIKE ?");
+                params.add(codigo + "%");
             }
 
-            // Si el campo 'nombre' no está vacío...
-            if (!nombre.isEmpty() && !nombre.equals("Ingresa el nombre")) {
-                conditions.add("Name LIKE ?"); // Buscar por nombre
-                params.add("%" + nombre + "%");  // Parámetro para 'Name' (con comodines)
+            // Language (txtnombre)
+            if (!nombre.isEmpty() && !nombre.equals("Ingresa el idioma")) {
+                conditions.add("Language LIKE ?");
+                params.add("%" + nombre + "%");
             }
 
-            // Si el campo 'continente' no está vacío...
-            if (!continente.isEmpty() && !continente.equals("Ingresa el continente")) {
-                conditions.add("Continent LIKE ?"); // Buscar por continente
-                params.add("%" + continente + "%"); // Parámetro para 'Continent'
+            // IsOfficial (txtcontinente) - Buscar por 'T' o 'F'
+            if (!continente.isEmpty() && !continente.equals("Ingresa T o F (Oficial)")) {
+                // Sólo toma la primera letra y la convierte a mayúscula
+                String isOfficialValue = continente.substring(0, 1).toUpperCase();
+                if (isOfficialValue.equals("T") || isOfficialValue.equals("F")) {
+                    conditions.add("IsOfficial = ?");
+                    params.add(isOfficialValue);
+                }
             }
 
-            // Si el campo 'poblacion' no está vacío...
-            if (!poblacion.isEmpty() && !poblacion.equals("Ingresa la población")) {
-                conditions.add("Population >= ?"); // Buscar población MAYOR O IGUAL que
-                params.add(Integer.parseInt(poblacion)); // Parámetro numérico
+            // Percentage (txtpoblacion) - Buscar porcentaje MAYOR O IGUAL que
+            if (!poblacion.isEmpty() && !poblacion.equals("Ingresa el porcentaje")) {
+                conditions.add("Percentage >= ?");
+                params.add(Double.parseDouble(poblacion)); // CAMBIO: Usar Double
             }
 
             // 4. Construye la consulta final
             if (!conditions.isEmpty()) {
-                // Si hay al menos una condición, une todas con " AND "
                 sqlBase += " WHERE " + String.join(" AND ", conditions);
             }
 
-            sqlBase += " LIMIT 100"; // Limitar a 100 resultados
+            sqlBase += " ORDER BY CountryCode, Language LIMIT 100";
 
             // 5. Ejecuta la consulta
             Connection miConexion = Conexion.getConnection();
@@ -198,23 +204,23 @@ public class VistaIdiomas extends javax.swing.JFrame {
                     // 6. Recorre los resultados y llena el modelo de la tabla
                     while (rs.next()) {
                         modelo.addRow(new Object[]{
-                            rs.getString("Code"),
-                            rs.getString("Name"),
-                            rs.getString("Continent"),
-                            rs.getInt("Population")
+                            rs.getString("CountryCode"), // COLUMNA ACTUALIZADA
+                            rs.getString("Language"), // COLUMNA ACTUALIZADA
+                            rs.getString("IsOfficial"), // COLUMNA ACTUALIZADA
+                            rs.getDouble("Percentage") // COLUMNA Y MÉTODO ACTUALIZADOS
                         });
                     }
 
                     if (modelo.getRowCount() == 0) {
                         System.out.println("No se encontraron resultados para la búsqueda.");
                     } else {
-                        System.out.println(modelo.getRowCount() + " países cargados.");
+                        System.out.println(modelo.getRowCount() + " idiomas cargados.");
                     }
                 }
             }
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La población debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "El porcentaje debe ser un número válido (ej: 50.0).", "Error de Formato", JOptionPane.ERROR_MESSAGE); // MENSAJE ACTUALIZADO
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -366,6 +372,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(229, 246, 246));
+        jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel1.setForeground(new java.awt.Color(255, 255, 255));
         jPanel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -472,20 +479,20 @@ public class VistaIdiomas extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 50));
 
-        jLabel2.setText("Idioma");
+        jLabel2.setText("Código País");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, -1, -1));
 
-        jLabel3.setText("Nombre");
+        jLabel3.setText("Idioma");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 250, -1, -1));
 
-        jLabel4.setText("Continente");
+        jLabel4.setText("Oficial (T/F)");
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 310, -1, -1));
 
-        jLabel5.setText("Población");
+        jLabel5.setText("Porcentaje");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 370, -1, -1));
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
-        txtcodigo.setText("Ingresa el codigo");
+        txtcodigo.setText("Ingresa el código de país");
         txtcodigo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcodigoFocusGained(evt);
@@ -507,7 +514,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
         getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 160, 40));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
-        txtcontinente.setText("Ingresa el continente");
+        txtcontinente.setText("Ingresa el idioma");
         txtcontinente.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtcontinenteFocusGained(evt);
@@ -524,7 +531,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
         getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 300, 160, 40));
 
         txtnombre.setForeground(new java.awt.Color(153, 153, 153));
-        txtnombre.setText("Ingresa el nombre");
+        txtnombre.setText("Ingresa T o F (Oficial)");
         txtnombre.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtnombreFocusGained(evt);
@@ -546,7 +553,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
         getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 240, 160, 40));
 
         txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
-        txtpoblacion.setText("Ingresa la población");
+        txtpoblacion.setText("Ingresa el porcentaje");
         txtpoblacion.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtpoblacionFocusGained(evt);
@@ -567,6 +574,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
         });
         getContentPane().add(txtpoblacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 360, 160, 40));
 
+        jTable1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -684,19 +692,32 @@ public class VistaIdiomas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
-        String codigo = txtcodigo.getText();
-        String nombre = txtnombre.getText();
-        String continente = txtcontinente.getText();
-        String poblacion = txtpoblacion.getText();
+        String codigoPais = txtcodigo.getText();      // CountryCode
+        String idioma = txtnombre.getText();          // Language
+        String isOfficial = txtcontinente.getText();  // IsOfficial (T/F)
+        String porcentaje = txtpoblacion.getText();   // Percentage
 
         // 2. Validar que los campos no estén vacíos (con los placeholders)
-        if (codigo.isEmpty() || codigo.equals("Ingresa el codigo")
-                || nombre.isEmpty() || nombre.equals("Ingresa el nombre")
-                || continente.isEmpty() || continente.equals("Ingresa el continente")
-                || poblacion.isEmpty() || poblacion.equals("Ingresa la población")) {
+        if (codigoPais.isEmpty() || codigoPais.equals("Ingresa el código de país")
+                || idioma.isEmpty() || idioma.equals("Ingresa el idioma")
+                || isOfficial.isEmpty() || isOfficial.equals("Ingresa T o F (Oficial)")
+                || porcentaje.isEmpty() || porcentaje.equals("Ingresa el porcentaje")) {
 
             JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
             return; // Salir si algo falta
+        }
+
+        // Validación: Código País (3 caracteres)
+        if (codigoPais.length() != 3) {
+            JOptionPane.showMessageDialog(this, "El código de país debe tener exactamente 3 caracteres (ej: CHL).", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validación: Oficial (T o F)
+        String isOfficialValue = isOfficial.toUpperCase();
+        if (!isOfficialValue.equals("T") && !isOfficialValue.equals("F")) {
+            JOptionPane.showMessageDialog(this, "El campo Oficial debe ser 'T' o 'F'.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         // --- INICIA LA LÓGICA DE BASE DE DATOS ---
@@ -705,57 +726,62 @@ public class VistaIdiomas extends javax.swing.JFrame {
             // 3. Obtener la conexión
             miConexion = Conexion.getConnection();
 
-            // 4. Preparar la consulta SQL (¡Usa los nombres de columna de tu BD!)
-            // (Asumo que son 'Code', 'Name', 'Continent', 'Population' de la BD 'world')
-            String sql = "INSERT INTO country (Code, Name, Continent, Population) VALUES (?, ?, ?, ?)";
+            // 4. Preparar la consulta SQL para countrylanguage
+            String sql = "INSERT INTO countrylanguage (CountryCode, Language, IsOfficial, Percentage) VALUES (?, ?, ?, ?)"; // SQL ACTUALIZADO
 
             // 5. Usar PreparedStatement para insertar datos de forma segura
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
 
                 // 6. Asignar los valores a los '?'
-                pstmt.setString(1, codigo);      // El 'Code' (ej: "CHL")
-                pstmt.setString(2, nombre);      // El 'Name'
-                pstmt.setString(3, continente);  // El 'Continent'
-                pstmt.setInt(4, Integer.parseInt(poblacion)); // La 'Population'
+                pstmt.setString(1, codigoPais.toUpperCase()); // CountryCode
+                pstmt.setString(2, idioma);                  // Language
+                pstmt.setString(3, isOfficialValue);         // IsOfficial
+                pstmt.setDouble(4, Double.parseDouble(porcentaje)); // Percentage (USAR setDouble)
 
                 // 7. Ejecutar la inserción
                 int filasAfectadas = pstmt.executeUpdate();
 
                 // 8. Verificar si la inserción fue exitosa
                 if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "¡País agregado exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "¡Idioma agregado exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                     // 9. Actualizar la tabla visual
-                    // (Llama al método de búsqueda que hicimos antes para refrescar)
-                    buscarPaises();
+                    buscarIdiomas(); // NOMBRE DEL MÉTODO ACTUALIZADO
 
                     // 10. Limpiar los campos de texto
-                    txtcodigo.setText("Ingresa el codigo");
+                    txtcodigo.setText("Ingresa el código de país"); // PLACEHOLDER ACTUALIZADO
                     txtcodigo.setForeground(new Color(153, 153, 153));
-                    txtnombre.setText("Ingresa el nombre");
+                    txtnombre.setText("Ingresa el idioma"); // PLACEHOLDER ACTUALIZADO
                     txtnombre.setForeground(new Color(153, 153, 153));
-                    txtcontinente.setText("Ingresa el continente");
+                    txtcontinente.setText("Ingresa T o F (Oficial)"); // PLACEHOLDER ACTUALIZADO
                     txtcontinente.setForeground(new Color(153, 153, 153));
-                    txtpoblacion.setText("Ingresa la población");
+                    txtpoblacion.setText("Ingresa el porcentaje"); // PLACEHOLDER ACTUALIZADO
                     txtpoblacion.setForeground(new Color(153, 153, 153));
 
                 } else {
-                    JOptionPane.showMessageDialog(this, "No se pudo agregar el país.", "Error", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "No se pudo agregar el idioma.", "Error", JOptionPane.WARNING_MESSAGE);
                 }
             }
 
         } catch (SQLException e) {
-            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
-            JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            String mensajeError = e.getMessage();
+            if (mensajeError.contains("Duplicate entry")) {
+                JOptionPane.showMessageDialog(this, "Error: El idioma '" + idioma + "' ya existe para el país '" + codigoPais + "'.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
+            } else if (mensajeError.contains("foreign key constraint fails")) {
+                JOptionPane.showMessageDialog(this, "Error: El código de país '" + codigoPais + "' no existe en la tabla de países (country).", "Error de Clave Foránea", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            }
             e.printStackTrace();
         } catch (NumberFormatException e) {
-            // Error si la población no es un número
-            JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            // Error si el porcentaje no es un número
+            JOptionPane.showMessageDialog(this, "El porcentaje debe ser un número válido (ej: 50.0).", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             // Cualquier otro error (ej: conexión)
             JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+
     }//GEN-LAST:event_btnagregarActionPerformed
 
     private void txtcodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigoActionPerformed
@@ -764,34 +790,20 @@ public class VistaIdiomas extends javax.swing.JFrame {
     }//GEN-LAST:event_txtcodigoActionPerformed
 
     private void txtcodigoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusGained
-        // TODO add your handling code here:
-        if (txtcodigo.getText().equals("Ingresa el codigo")) {
-            txtcodigo.setText("");
-            txtcodigo.setForeground(new Color(0, 0, 0));
-        }
+
     }//GEN-LAST:event_txtcodigoFocusGained
 
     private void txtcodigoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigoFocusLost
-        if (txtcodigo.getText().equals("")) {
-            txtcodigo.setText("Ingresa el codigo");
-            txtcodigo.setForeground(new Color(153, 153, 153));
-        }
+
     }//GEN-LAST:event_txtcodigoFocusLost
 
     private void txtnombreFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusGained
 
-        if (txtnombre.getText().equals("Ingresa el nombre")) {
-            txtnombre.setText("");
-            txtnombre.setForeground(new Color(0, 0, 0));
-        }
     }//GEN-LAST:event_txtnombreFocusGained
 
     private void txtnombreFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtnombreFocusLost
         // TODO add your handling code here:
-        if (txtnombre.getText().equals("")) {
-            txtnombre.setText("Ingresa el nombre");
-            txtnombre.setForeground(new Color(153, 153, 153));
-        }
+
     }//GEN-LAST:event_txtnombreFocusLost
 
     private void txtcontinenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcontinenteActionPerformed
@@ -799,34 +811,20 @@ public class VistaIdiomas extends javax.swing.JFrame {
     }//GEN-LAST:event_txtcontinenteActionPerformed
 
     private void txtcontinenteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusGained
-        // TODO add your handling code here:
-        if (txtcontinente.getText().equals("Ingresa el continente")) {
-            txtcontinente.setText("");
-            txtcontinente.setForeground(new Color(0, 0, 0));
-        }
+
     }//GEN-LAST:event_txtcontinenteFocusGained
 
     private void txtcontinenteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcontinenteFocusLost
-        if (txtcontinente.getText().equals("")) {
-            txtcontinente.setText("Ingresa el continente");
-            txtcontinente.setForeground(new Color(153, 153, 153));
-        }
+
 
     }//GEN-LAST:event_txtcontinenteFocusLost
 
     private void txtpoblacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusGained
-        // TODO add your handling code here:
-        if (txtpoblacion.getText().equals("Ingresa la población")) {
-            txtpoblacion.setText("");
-            txtpoblacion.setForeground(new Color(0, 0, 0));
-        }
+
     }//GEN-LAST:event_txtpoblacionFocusGained
 
     private void txtpoblacionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpoblacionFocusLost
-        if (txtpoblacion.getText().equals("")) {
-            txtpoblacion.setText("Ingresa la población");
-            txtpoblacion.setForeground(new Color(153, 153, 153));
-        }
+
     }//GEN-LAST:event_txtpoblacionFocusLost
 
     private void txtpoblacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpoblacionActionPerformed
@@ -856,7 +854,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
     }//GEN-LAST:event_txtnombreActionPerformed
 
     private void btnconsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnconsultarActionPerformed
-        buscarPaises();
+        buscarIdiomas();
     }//GEN-LAST:event_btnconsultarActionPerformed
 
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
@@ -864,28 +862,41 @@ public class VistaIdiomas extends javax.swing.JFrame {
 
         // 2. Validar que haya una fila seleccionada
         if (filaSeleccionada < 0) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un país de la tabla para modificar.", "Fila no seleccionada", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un idioma de la tabla para modificar.", "Fila no seleccionada", JOptionPane.WARNING_MESSAGE);
             return; // Salir del método si no hay nada seleccionado
         }
 
-        // 3. Obtener el CÓDIGO ORIGINAL (PK) de la tabla
-        //    (Es más seguro que leerlo del textfield, por si el usuario lo cambió)
+        // 3. Obtener la CLAVE COMPUESTA ORIGINAL (PK: CountryCode y Language) de la tabla
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-        String codigoOriginal = modelo.getValueAt(filaSeleccionada, 0).toString();
+        String codigoPaisOriginal = modelo.getValueAt(filaSeleccionada, 0).toString(); // CountryCode original
+        String idiomaOriginal = modelo.getValueAt(filaSeleccionada, 1).toString();     // Language original
 
         // 4. Obtener los NUEVOS valores de los campos de texto
-        String codigoNuevo = txtcodigo.getText();
-        String nombreNuevo = txtnombre.getText();
-        String continenteNuevo = txtcontinente.getText();
-        String poblacionNueva = txtpoblacion.getText();
+        String codigoPaisNuevo = txtcodigo.getText();        // CountryCode nuevo
+        String idiomaNuevo = txtnombre.getText();            // Language nuevo
+        String isOfficialNuevo = txtcontinente.getText();    // IsOfficial nuevo
+        String porcentajeNuevo = txtpoblacion.getText();     // Percentage nuevo
 
         // 5. Validar que los campos no estén vacíos (con los placeholders)
-        if (codigoNuevo.isEmpty() || codigoNuevo.equals("Ingresa el codigo")
-                || nombreNuevo.isEmpty() || nombreNuevo.equals("Ingresa el nombre")
-                || continenteNuevo.isEmpty() || continenteNuevo.equals("Ingresa el continente")
-                || poblacionNueva.isEmpty() || poblacionNueva.equals("Ingresa la población")) {
+        if (codigoPaisNuevo.isEmpty() || codigoPaisNuevo.equals("Ingresa el código de país")
+                || idiomaNuevo.isEmpty() || idiomaNuevo.equals("Ingresa el idioma")
+                || isOfficialNuevo.isEmpty() || isOfficialNuevo.equals("Ingresa T o F (Oficial)")
+                || porcentajeNuevo.isEmpty() || porcentajeNuevo.equals("Ingresa el porcentaje")) {
 
             JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Validación: Código País (3 caracteres)
+        if (codigoPaisNuevo.length() != 3) {
+            JOptionPane.showMessageDialog(this, "El código de país debe tener exactamente 3 caracteres (ej: CHL).", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validación: Oficial (T o F)
+        String isOfficialValue = isOfficialNuevo.toUpperCase();
+        if (!isOfficialValue.equals("T") && !isOfficialValue.equals("F")) {
+            JOptionPane.showMessageDialog(this, "El campo Oficial debe ser 'T' o 'F'.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -895,60 +906,59 @@ public class VistaIdiomas extends javax.swing.JFrame {
             // 6. Obtener la conexión
             miConexion = Conexion.getConnection();
 
-            // 7. Preparar la consulta SQL UPDATE
-            //    (Usamos los nombres de columna de tu BD: Code, Name, Continent, Population)
-            //    Esto te permite modificar todos los campos, incluso el código (PK)
-            String sql = "UPDATE country SET Code = ?, Name = ?, Continent = ?, Population = ? WHERE Code = ?";
+            // 7. Preparar la consulta SQL UPDATE para countrylanguage (clave compuesta)
+            String sql = "UPDATE countrylanguage SET CountryCode = ?, Language = ?, IsOfficial = ?, Percentage = ? WHERE CountryCode = ? AND Language = ?"; // SQL ACTUALIZADO (USANDO 2 CAMPOS EN EL WHERE)
 
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
 
                 // 8. Asignar los NUEVOS valores (columnas SET)
-                pstmt.setString(1, codigoNuevo);
-                pstmt.setString(2, nombreNuevo);
-                pstmt.setString(3, continenteNuevo);
-                pstmt.setInt(4, Integer.parseInt(poblacionNueva));
+                pstmt.setString(1, codigoPaisNuevo.toUpperCase());
+                pstmt.setString(2, idiomaNuevo);
+                pstmt.setString(3, isOfficialValue);
+                pstmt.setDouble(4, Double.parseDouble(porcentajeNuevo)); // USAR setDouble
 
-                // 9. Asignar el CÓDIGO ORIGINAL (columna WHERE)
-                //    Así sabe qué fila actualizar
-                pstmt.setString(5, codigoOriginal);
+                // 9. Asignar los valores ORIGINALES de la clave primaria (columnas WHERE)
+                pstmt.setString(5, codigoPaisOriginal);
+                pstmt.setString(6, idiomaOriginal);
 
                 // 10. Ejecutar la modificación
                 int filasAfectadas = pstmt.executeUpdate();
 
                 // 11. Verificar el resultado
                 if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "¡País modificado exitosamente en la BD!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "¡Idioma modificado exitosamente en la BD!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
-                    // 12. Refrescar la tabla (llamando al método que ya creamos)
-                    buscarPaises();
+                    // 12. Refrescar la tabla
+                    buscarIdiomas(); // NOMBRE DEL MÉTODO ACTUALIZADO
 
-                    // 13. Limpiar los campos (como en tu código original)
-                    txtcodigo.setText("Ingresa el codigo");
+                    // 13. Limpiar los campos
+                    txtcodigo.setText("Ingresa el código de país"); // PLACEHOLDER ACTUALIZADO
                     txtcodigo.setForeground(new Color(153, 153, 153));
-                    txtnombre.setText("Ingresa el nombre");
+                    txtnombre.setText("Ingresa el idioma"); // PLACEHOLDER ACTUALIZADO
                     txtnombre.setForeground(new Color(153, 153, 153));
-                    txtcontinente.setText("Ingresa el continente");
+                    txtcontinente.setText("Ingresa T o F (Oficial)"); // PLACEHOLDER ACTUALIZADO
                     txtcontinente.setForeground(new Color(153, 153, 153));
-                    txtpoblacion.setText("Ingresa la población");
+                    txtpoblacion.setText("Ingresa el porcentaje"); // PLACEHOLDER ACTUALIZADO
                     txtpoblacion.setForeground(new Color(153, 153, 153));
 
                 } else {
-                    JOptionPane.showMessageDialog(this, "No se encontró el país para modificar (pudo ser borrado por otro usuario).", "Error", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "No se encontró el idioma para modificar.", "Error", JOptionPane.WARNING_MESSAGE);
                 }
             }
 
         } catch (SQLException e) {
-            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
             String mensajeError = e.getMessage();
             if (mensajeError.contains("Duplicate entry")) {
-                JOptionPane.showMessageDialog(this, "Error: El nuevo código '" + codigoNuevo + "' ya existe en la BD.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error: El nuevo idioma '" + idiomaNuevo + "' ya existe para el país '" + codigoPaisNuevo + "'.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
+            } else if (mensajeError.contains("foreign key constraint fails")) {
+                JOptionPane.showMessageDialog(this, "Error: El nuevo código de país '" + codigoPaisNuevo + "' no existe en la tabla de países (country).", "Error de Clave Foránea", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error al modificar en la base de datos: " + mensajeError, "Error SQL", JOptionPane.ERROR_MESSAGE);
             }
             e.printStackTrace();
         } catch (NumberFormatException e) {
-            // Error si la población no es un número
-            JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            // Error si el porcentaje no es un número
+            JOptionPane.showMessageDialog(this, "El porcentaje debe ser un número válido (ej: 50.0).", "Error de Formato", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             // Cualquier otro error (ej: conexión)
             JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -959,14 +969,15 @@ public class VistaIdiomas extends javax.swing.JFrame {
 
     private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
         String texto = txtcodigo.getText();
-        if (texto.length() >= 3) {
+        if (texto.length() >= 3) { // El código de país solo tiene 3 caracteres
             evt.consume();
         }
     }//GEN-LAST:event_txtcodigoKeyTyped
 
     private void txtpoblacionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtpoblacionKeyTyped
         char n = evt.getKeyChar();
-        if (n < '0' || n > '9') {
+        // Permite dígitos y un punto decimal para el porcentaje
+        if ((n < '0' || n > '9') && n != '.') {
             evt.consume();
         }
 
