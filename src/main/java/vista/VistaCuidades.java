@@ -47,6 +47,11 @@ public class VistaCuidades extends javax.swing.JFrame {
     private int papulandiaClickCount = 0;
 
     public VistaCuidades() {
+        // CONSTRUCTOR POR DEFECTO RESTAURADO. Delega la inicialización al constructor con String, pasando null.
+        this(null);
+    }
+
+    public VistaCuidades(String countryCode) {
         initComponents();
         // Título de la ventana corregido
         setTitle("Lista de Ciudades");
@@ -71,14 +76,17 @@ public class VistaCuidades extends javax.swing.JFrame {
                         // Rellena los campos con los datos de la tabla (5 columnas: ID, Nombre, Distrito, Cód. País, Población)
                         txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());     // ID (Index 0)
                         txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());     // Nombre (Index 1)
-                        txtcodigo1.setText(modelo.getValueAt(filaSeleccionada, 2).toString());    // <<< DISTRITO (Index 2) - NUEVO
-                        txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 3).toString()); // Cód. País (Index 3) - CORREGIDO
-                        txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 4).toString());  // Población (Index 4) - CORREGIDO
+                        // Índice 2 es Distrito
+                        txtcodigo1.setText(modelo.getValueAt(filaSeleccionada, 2).toString());    // Distrito (Index 2)
+                        // Índice 3 es Cód. País
+                        txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 3).toString()); // Cód. País (Index 3)
+                        // Índice 4 es Población
+                        txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 4).toString());  // Población (Index 4)
 
                         // Pone el texto en negro (quitando el placeholder gris)
                         txtcodigo.setForeground(Color.black);
                         txtnombre.setForeground(Color.black);
-                        txtcodigo1.setForeground(Color.black); // <<< NUEVO COLOR
+                        txtcodigo1.setForeground(Color.black);
                         txtcontinente.setForeground(Color.black);
                         txtpoblacion.setForeground(Color.black);
                     }
@@ -86,7 +94,15 @@ public class VistaCuidades extends javax.swing.JFrame {
             }
         });
 
-        // Llama al método de búsqueda corregido
+        // Lógica de filtro para el nuevo constructor
+        if (countryCode != null) {
+            // 1. Rellena el campo de filtro Cód. País con el código recibido.
+            txtcontinente.setText(countryCode);
+            // 2. Quita el color de placeholder (gris) para que se vea como texto de filtro.
+            txtcontinente.setForeground(Color.black);
+        }
+
+        // Llama al método de búsqueda, que usará el valor de txtcontinente si no es el placeholder
         buscarCiudades();
     }
 
@@ -240,6 +256,64 @@ public class VistaCuidades extends javax.swing.JFrame {
         personalizarTablaEstiloFrutiger();
     }
 
+    private void mostrarCiudadesMasPobladas() {
+        // Define las columnas para el reporte (5 columnas)
+        DefaultTableModel modelo = new DefaultTableModel(
+                new Object[]{"ID", "Ciudad", "País", "Continente", "Población"}, 0
+        );
+
+        Connection miConexion = null;
+        try {
+            miConexion = Conexion.getConnection();
+
+            // SQL: Une city (T1) con country (T2) para obtener el País y Continente. Ordena por población DESC.
+            String sql = "SELECT "
+                    + "T1.ID, T1.Name AS CityName, T1.Population, "
+                    + "T2.Name AS CountryName, T2.Continent "
+                    + "FROM city T1 "
+                    + "JOIN country T2 ON T1.CountryCode = T2.Code "
+                    + "ORDER BY T1.Population DESC "
+                    + "LIMIT 50"; // Limitar a las 50 ciudades más pobladas
+
+            try (java.sql.Statement stmt = miConexion.createStatement(); java.sql.ResultSet rs = stmt.executeQuery(sql)) {
+
+                System.out.println("Ejecutando consulta de Ciudades más pobladas: " + sql);
+
+                while (rs.next()) {
+                    // Formatear la población para mejor lectura
+                    String formattedPopulation = String.format("%,d", rs.getInt("Population"));
+
+                    modelo.addRow(new Object[]{
+                        rs.getInt("ID"),
+                        rs.getString("CityName"),
+                        rs.getString("CountryName"),
+                        rs.getString("Continent"),
+                        formattedPopulation
+                    });
+                }
+
+                if (modelo.getRowCount() == 0) {
+                    JOptionPane.showMessageDialog(this, "No se encontraron datos de ciudades.", "Error de Datos", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Reporte de " + modelo.getRowCount() + " ciudades cargado con éxito, ordenado por población (Top 50).",
+                            "Reporte Generado",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al generar reporte de ciudades más pobladas: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
+        // Asignar el modelo a la tabla
+        jTable1.setModel(modelo);
+        personalizarTablaEstiloFrutiger();
+    }
+
     public class EjemploConsulta {
 
         public void consultarPaises() {
@@ -344,6 +418,7 @@ public class VistaCuidades extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnCuidadesMasPobladas = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         minBtn = new javax.swing.JButton();
         extBtn = new javax.swing.JButton();
@@ -370,13 +445,18 @@ public class VistaCuidades extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jDesktopPane1 = new javax.swing.JDesktopPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnCuidadesMasPobladas.setText("Mas pobladas");
+        btnCuidadesMasPobladas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCuidadesMasPobladasActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnCuidadesMasPobladas, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 110, 110, 30));
 
         jPanel1.setBackground(new java.awt.Color(229, 246, 246));
         jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -471,12 +551,12 @@ public class VistaCuidades extends javax.swing.JFrame {
                     .addComponent(btnCerrarSesion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(minBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(extBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnIdiomas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnPaises, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnCuidades, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnPaises, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(btnIdiomas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -630,7 +710,7 @@ public class VistaCuidades extends javax.swing.JFrame {
         jTable1.setInheritsPopupMenu(true);
         jScrollPane1.setViewportView(jTable1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 80, 560, 399));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 80, 610, 399));
 
         btnagregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Agregar.png"))); // NOI18N
         btnagregar.setBorder(null);
@@ -693,28 +773,6 @@ public class VistaCuidades extends javax.swing.JFrame {
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FOndooo.png"))); // NOI18N
         jLabel7.setText("jLabel7");
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 40, 930, 620));
-
-        javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
-        jDesktopPane1.setLayout(jDesktopPane1Layout);
-        jDesktopPane1Layout.setHorizontalGroup(
-            jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jDesktopPane1Layout.setVerticalGroup(
-            jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 40, Short.MAX_VALUE)
-        );
-
-        getContentPane().add(jDesktopPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, -1, 40));
-
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane2.setViewportView(jList1);
-
-        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1099,10 +1157,15 @@ public class VistaCuidades extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtcodigo1KeyTyped
 
+    private void btnCuidadesMasPobladasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCuidadesMasPobladasActionPerformed
+        mostrarCiudadesMasPobladas();        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCuidadesMasPobladasActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSesion;
     private javax.swing.JButton btnCuidades;
+    private javax.swing.JButton btnCuidadesMasPobladas;
     private javax.swing.JButton btnIdiomas;
     private javax.swing.JButton btnPaises;
     private javax.swing.JButton btnagregar;
@@ -1110,7 +1173,6 @@ public class VistaCuidades extends javax.swing.JFrame {
     private javax.swing.JButton btnmodificar;
     private javax.swing.JButton extBtn;
     private javax.swing.JButton jButton1;
-    private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1119,10 +1181,8 @@ public class VistaCuidades extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JButton minBtn;
     private javax.swing.JTextField txtcodigo;

@@ -47,8 +47,13 @@ public class VistaIdiomas extends javax.swing.JFrame {
     private int papulandiaClickCount = 0;
 
     public VistaIdiomas() {
+        // Constructor por defecto restaurado: delega la llamada sin filtro
+        this(null);
+    }
+
+    public VistaIdiomas(String countryCode) {
         initComponents();
-        setTitle("Lista de Paises");
+        setTitle("Lista de Idiomas"); // Título corregido
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setSize(1220, 600);
@@ -61,23 +66,43 @@ public class VistaIdiomas extends javax.swing.JFrame {
         setPlaceholder(txtnombre, "Ingresa el idioma");
         setPlaceholder(txtcontinente, "Ingresa T o F (Oficial)");
         setPlaceholder(txtpoblacion, "Ingresa el porcentaje");
+
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
                 int filaSeleccionada = jTable1.getSelectedRow();
                 if (filaSeleccionada >= 0) {
                     DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-                    txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
-                    txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
-                    txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
-                    txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
 
-                    txtcodigo.setForeground(Color.black);
-                    txtnombre.setForeground(Color.black);
-                    txtcontinente.setForeground(Color.black);
-                    txtpoblacion.setForeground(Color.black);
+                    // *** AÑADIR ESTA VERIFICACIÓN: Solo intentar rellenar los campos si la tabla tiene 4 o más columnas (el modo normal) ***
+                    if (modelo.getColumnCount() >= 4) {
+
+                        // Cargar datos de 4 columnas (Modo Normal: Código, Idioma, Oficial, Porcentaje)
+                        txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
+                        txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
+                        txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
+                        txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
+
+                        txtcodigo.setForeground(Color.black);
+                        txtnombre.setForeground(Color.black);
+                        txtcontinente.setForeground(Color.black);
+                        txtpoblacion.setForeground(Color.black);
+
+                    }
+                    // Si la tabla tiene menos de 4 columnas (es el reporte de 2 columnas), no se hace nada, 
+                    // ya que los campos de filtro no son aplicables a ese reporte.
                 }
             }
         });
+
+        // Lógica de filtro para el nuevo constructor
+        if (countryCode != null) {
+            // 1. Rellena el campo de filtro Código País (txtcodigo) con el código recibido.
+            txtcodigo.setText(countryCode);
+            // 2. Quita el color de placeholder (gris) para que el filtro sea activo.
+            txtcodigo.setForeground(Color.black);
+        }
+
+        // La búsqueda se ejecuta al final, usando el filtro que acabamos de establecer
         buscarIdiomas();
     }
 
@@ -235,6 +260,63 @@ public class VistaIdiomas extends javax.swing.JFrame {
         personalizarTablaEstiloFrutiger();
     }
 
+    private void mostrarIdiomasMasHablados() {
+        // Define las columnas para el reporte
+        DefaultTableModel modelo = new DefaultTableModel(
+                new Object[]{"Idioma", "Hablantes Estimados"}, 0
+        );
+
+        Connection miConexion = null;
+        try {
+            miConexion = Conexion.getConnection();
+
+            // SQL: Calcula el número absoluto de hablantes por idioma a nivel mundial
+            String sql = "SELECT "
+                    + "T1.Language, "
+                    + "SUM(T2.Population * T1.Percentage / 100) AS TotalSpeakers " // Población del País * Porcentaje de Idioma
+                    + "FROM countrylanguage T1 "
+                    + "JOIN country T2 ON T1.CountryCode = T2.Code "
+                    + "GROUP BY T1.Language "
+                    + "ORDER BY TotalSpeakers DESC "
+                    + "LIMIT 50"; // Limitar a los 50 idiomas principales
+
+            try (java.sql.Statement stmt = miConexion.createStatement(); java.sql.ResultSet rs = stmt.executeQuery(sql)) {
+
+                System.out.println("Ejecutando consulta de Idiomas más hablados: " + sql);
+
+                while (rs.next()) {
+                    double totalSpeakers = rs.getDouble("TotalSpeakers");
+                    // Formatear el número de hablantes para mejor lectura
+                    String formattedSpeakers = String.format("%,.0f", totalSpeakers);
+
+                    modelo.addRow(new Object[]{
+                        rs.getString("Language"),
+                        formattedSpeakers
+                    });
+                }
+
+                if (modelo.getRowCount() == 0) {
+                    JOptionPane.showMessageDialog(this, "No se encontraron datos de idiomas.", "Error de Datos", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Reporte de " + modelo.getRowCount() + " idiomas cargado con éxito, ordenado por número estimado de hablantes.",
+                            "Reporte Generado",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al generar reporte de idiomas: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
+        // Asignar el modelo a la tabla
+        jTable1.setModel(modelo);
+        personalizarTablaEstiloFrutiger();
+    }
+
     public class EjemploConsulta {
 
         public void consultarPaises() {
@@ -339,6 +421,7 @@ public class VistaIdiomas extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btnIdiomasMasHablado = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         minBtn = new javax.swing.JButton();
         extBtn = new javax.swing.JButton();
@@ -363,13 +446,18 @@ public class VistaIdiomas extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jDesktopPane1 = new javax.swing.JDesktopPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnIdiomasMasHablado.setText("Idioma mas Hablado");
+        btnIdiomasMasHablado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIdiomasMasHabladoActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnIdiomasMasHablado, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 80, 140, -1));
 
         jPanel1.setBackground(new java.awt.Color(229, 246, 246));
         jPanel1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -666,28 +754,6 @@ public class VistaIdiomas extends javax.swing.JFrame {
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FOndooo.png"))); // NOI18N
         jLabel7.setText("jLabel7");
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 40, 930, 620));
-
-        javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
-        jDesktopPane1.setLayout(jDesktopPane1Layout);
-        jDesktopPane1Layout.setHorizontalGroup(
-            jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jDesktopPane1Layout.setVerticalGroup(
-            jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 40, Short.MAX_VALUE)
-        );
-
-        getContentPane().add(jDesktopPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 0, -1, 40));
-
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane2.setViewportView(jList1);
-
-        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1064,18 +1130,22 @@ public class VistaIdiomas extends javax.swing.JFrame {
         this.dispose();         // TODO add your handling code here:
     }//GEN-LAST:event_btnCuidadesActionPerformed
 
+    private void btnIdiomasMasHabladoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIdiomasMasHabladoActionPerformed
+        mostrarIdiomasMasHablados();
+    }//GEN-LAST:event_btnIdiomasMasHabladoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSesion;
     private javax.swing.JButton btnCuidades;
     private javax.swing.JButton btnIdiomas;
+    private javax.swing.JCheckBox btnIdiomasMasHablado;
     private javax.swing.JButton btnPaises;
     private javax.swing.JButton btnagregar;
     private javax.swing.JButton btnconsultar;
     private javax.swing.JButton btnmodificar;
     private javax.swing.JButton extBtn;
     private javax.swing.JButton jButton1;
-    private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1083,10 +1153,8 @@ public class VistaIdiomas extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JButton minBtn;
     private javax.swing.JTextField txtcodigo;
