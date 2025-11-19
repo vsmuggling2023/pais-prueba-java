@@ -19,7 +19,7 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,88,0,0,3,-4"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,88,0,0,4,-60"/>
   </AuxValues>
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
@@ -49,7 +49,7 @@
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="0" y="0" width="1020" height="50"/>
+          <AbsoluteConstraints x="0" y="0" width="1220" height="50"/>
         </Constraint>
       </Constraints>
 
@@ -59,13 +59,13 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnCerrarSesion" min="-2" pref="122" max="-2" attributes="0"/>
-                  <EmptySpace pref="389" max="32767" attributes="0"/>
+                  <EmptySpace pref="466" max="32767" attributes="0"/>
                   <Component id="btnPaises" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="86" max="-2" attributes="0"/>
                   <Component id="btnCuidades" min="-2" pref="99" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
                   <Component id="btnIdiomas" min="-2" pref="100" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="118" max="-2" attributes="0"/>
                   <Component id="minBtn" min="-2" pref="40" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="extBtn" min="-2" max="-2" attributes="0"/>
@@ -75,16 +75,17 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="btnPaises" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnCuidades" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnIdiomas" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="btnCerrarSesion" alignment="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="minBtn" alignment="0" min="-2" pref="40" max="-2" attributes="0"/>
-                          <Component id="extBtn" alignment="0" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="btnCerrarSesion" alignment="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="minBtn" alignment="0" min="-2" pref="40" max="-2" attributes="0"/>
+                      <Component id="extBtn" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="btnIdiomas" alignment="1" max="32767" attributes="0"/>
+                              <Component id="btnCuidades" alignment="1" max="32767" attributes="0"/>
+                              <Component id="btnPaises" alignment="1" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -292,7 +293,7 @@
       </AuxValues>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="430" y="80" width="560" height="399"/>
+          <AbsoluteConstraints x="490" y="80" width="560" height="399"/>
         </Constraint>
       </Constraints>
 
@@ -390,7 +391,7 @@
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="500" y="510" width="140" height="50"/>
+          <AbsoluteConstraints x="550" y="490" width="140" height="50"/>
         </Constraint>
       </Constraints>
     </Component>
@@ -413,7 +414,7 @@
       </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="740" y="510" width="130" height="50"/>
+          <AbsoluteConstraints x="840" y="490" width="130" height="50"/>
         </Constraint>
       </Constraints>
     </Component>
@@ -465,7 +466,7 @@
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="920" y="490" width="100" height="110"/>
+          <AbsoluteConstraints x="1120" y="500" width="100" height="110"/>
         </Constraint>
       </Constraints>
     </Component>

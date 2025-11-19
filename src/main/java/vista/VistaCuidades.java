@@ -52,7 +52,7 @@ public class VistaCuidades extends javax.swing.JFrame {
         setTitle("Lista de Ciudades");
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.setSize(1020, 600);
+        this.setSize(1220, 600);
         cargarMusicaDeFondo();
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/icons/Papulandia2.png")).getImage());
         personalizarTablaEstiloFrutiger();
@@ -68,16 +68,17 @@ public class VistaCuidades extends javax.swing.JFrame {
                     if (filaSeleccionada >= 0) {
                         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
 
-                        // Rellena los campos con los datos de la tabla (4 columnas)
-                        txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());
-                        txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());
-                        // txtcontinente ahora es usado para 'CountryCode'
-                        txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 2).toString());
-                        txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 3).toString());
+                        // Rellena los campos con los datos de la tabla (5 columnas: ID, Nombre, Distrito, Cód. País, Población)
+                        txtcodigo.setText(modelo.getValueAt(filaSeleccionada, 0).toString());     // ID (Index 0)
+                        txtnombre.setText(modelo.getValueAt(filaSeleccionada, 1).toString());     // Nombre (Index 1)
+                        txtcodigo1.setText(modelo.getValueAt(filaSeleccionada, 2).toString());    // <<< DISTRITO (Index 2) - NUEVO
+                        txtcontinente.setText(modelo.getValueAt(filaSeleccionada, 3).toString()); // Cód. País (Index 3) - CORREGIDO
+                        txtpoblacion.setText(modelo.getValueAt(filaSeleccionada, 4).toString());  // Población (Index 4) - CORREGIDO
 
                         // Pone el texto en negro (quitando el placeholder gris)
                         txtcodigo.setForeground(Color.black);
                         txtnombre.setForeground(Color.black);
+                        txtcodigo1.setForeground(Color.black); // <<< NUEVO COLOR
                         txtcontinente.setForeground(Color.black);
                         txtpoblacion.setForeground(Color.black);
                     }
@@ -132,23 +133,14 @@ public class VistaCuidades extends javax.swing.JFrame {
         });
     }
 
-    /**
-     * Ejecuta una consulta SQL dinámica a la base de datos 'country' basándose
-     * en los campos de texto y actualiza la jTable.
-     */
-    /**
-     * RENOMBRADO: de buscarPaises a buscarCiudades Ejecuta una consulta SQL
-     * dinámica a la base de datos 'city' basándose en los campos de texto y
-     * actualiza la jTable.
-     */
     private void buscarCiudades() {
-        // Define las columnas para el modelo de la tabla (CORREGIDO)
+        // Define las columnas para el modelo de la tabla (AHORA 5 COLUMNAS)
         DefaultTableModel modelo = new DefaultTableModel(
-                new Object[]{"ID", "Nombre", "Código Pais", "Poblacion"}, 0
+                new Object[]{"ID", "Nombre", "Distrito", "Cód. País", "Población"}, 0
         );
 
-        // 1. Prepara la consulta SQL base (CORREGIDO a la tabla 'city')
-        String sqlBase = "SELECT ID, Name, CountryCode, Population FROM city";
+        // 1. Prepara la consulta SQL base (AGREGANDO DISTRICT)
+        String sqlBase = "SELECT ID, Name, District, CountryCode, Population FROM city";
 
         // Listas para construir la consulta dinámica de forma segura
         ArrayList<String> conditions = new ArrayList<>();
@@ -157,7 +149,8 @@ public class VistaCuidades extends javax.swing.JFrame {
         // 2. Recoge los textos de los campos
         String id = txtcodigo.getText();
         String nombre = txtnombre.getText();
-        // txtcontinente ahora se usa para CountryCode
+        String distrito = txtcodigo1.getText(); // <<< NUEVA LECTURA DEL CAMPO DISTRITO
+        // txtcontinente se usa para CountryCode
         String codigoPais = txtcontinente.getText();
         String poblacion = txtpoblacion.getText();
 
@@ -174,6 +167,12 @@ public class VistaCuidades extends javax.swing.JFrame {
             if (!nombre.isEmpty() && !nombre.equals("Ingresa el nombre")) {
                 conditions.add("Name LIKE ?");
                 params.add("%" + nombre + "%");
+            }
+
+            // Si el campo 'distrito' no está vacío... <<< LÓGICA DE BÚSQUEDA POR DISTRITO
+            if (!distrito.isEmpty() && !distrito.equals("Ingresa el Distrito")) {
+                conditions.add("District LIKE ?");
+                params.add("%" + distrito + "%");
             }
 
             // Si el campo 'codigoPais' (txtcontinente) no está vacío...
@@ -193,7 +192,7 @@ public class VistaCuidades extends javax.swing.JFrame {
                 sqlBase += " WHERE " + String.join(" AND ", conditions);
             }
 
-            sqlBase += " LIMIT 100"; // Limitar a 100 resultados
+            sqlBase += " LIMIT 100";
 
             // 5. Ejecuta la consulta
             Connection miConexion = Conexion.getConnection();
@@ -207,11 +206,12 @@ public class VistaCuidades extends javax.swing.JFrame {
                 try (ResultSet rs = pstmt.executeQuery()) {
                     System.out.println("Ejecutando consulta: " + pstmt.toString());
 
-                    // 6. Recorre los resultados (CORREGIDO para 'city')
+                    // 6. Recorre los resultados (AHORA OBTENIENDO 5 CAMPOS)
                     while (rs.next()) {
                         modelo.addRow(new Object[]{
                             rs.getInt("ID"),
                             rs.getString("Name"),
+                            rs.getString("District"), // AÑADE EL DISTRITO
                             rs.getString("CountryCode"),
                             rs.getInt("Population")
                         });
@@ -220,7 +220,6 @@ public class VistaCuidades extends javax.swing.JFrame {
                     if (modelo.getRowCount() == 0) {
                         System.out.println("No se encontraron resultados para la búsqueda.");
                     } else {
-                        // Mensaje corregido
                         System.out.println(modelo.getRowCount() + " ciudades cargadas.");
                     }
                 }
@@ -356,8 +355,10 @@ public class VistaCuidades extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
         txtcodigo = new javax.swing.JTextField();
         txtcontinente = new javax.swing.JTextField();
+        txtcodigo1 = new javax.swing.JTextField();
         txtnombre = new javax.swing.JTextField();
         txtpoblacion = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -452,13 +453,13 @@ public class VistaCuidades extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnCerrarSesion, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 389, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 481, Short.MAX_VALUE)
                 .addComponent(btnPaises)
-                .addGap(50, 50, 50)
+                .addGap(63, 63, 63)
                 .addComponent(btnCuidades, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(39, 39, 39)
+                .addGap(60, 60, 60)
                 .addComponent(btnIdiomas, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(51, 51, 51)
+                .addGap(125, 125, 125)
                 .addComponent(minBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(extBtn))
@@ -466,31 +467,35 @@ public class VistaCuidades extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnPaises)
-                        .addComponent(btnCuidades)
-                        .addComponent(btnIdiomas))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(btnCerrarSesion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addComponent(minBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(extBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(btnCerrarSesion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(minBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(extBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnIdiomas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCuidades, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnPaises, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 50));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1220, 50));
 
-        jLabel2.setText("Id");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, -1, -1));
+        jLabel2.setText("Distrito");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 250, -1, -1));
 
         jLabel3.setText("Nombre");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 250, -1, -1));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 190, -1, -1));
 
         jLabel4.setText("Codigo Pais");
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 310, -1, -1));
 
         jLabel5.setText("Población");
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 370, -1, -1));
+
+        jLabel9.setText("Id");
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 130, -1, -1));
 
         txtcodigo.setForeground(new java.awt.Color(153, 153, 153));
         txtcodigo.setText("Ingresa el ID");
@@ -512,7 +517,7 @@ public class VistaCuidades extends javax.swing.JFrame {
                 txtcodigoKeyTyped(evt);
             }
         });
-        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 190, 160, 40));
+        getContentPane().add(txtcodigo, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, 160, 40));
 
         txtcontinente.setForeground(new java.awt.Color(153, 153, 153));
         txtcontinente.setText("Ingresa el código de pais");
@@ -530,6 +535,28 @@ public class VistaCuidades extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txtcontinente, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 300, 160, 40));
+
+        txtcodigo1.setForeground(new java.awt.Color(153, 153, 153));
+        txtcodigo1.setText("Ingresa el Distrito");
+        txtcodigo1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtcodigo1FocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtcodigo1FocusLost(evt);
+            }
+        });
+        txtcodigo1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtcodigo1ActionPerformed(evt);
+            }
+        });
+        txtcodigo1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtcodigo1KeyTyped(evt);
+            }
+        });
+        getContentPane().add(txtcodigo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 240, 160, 40));
 
         txtnombre.setForeground(new java.awt.Color(153, 153, 153));
         txtnombre.setText("Ingresa el nombre");
@@ -551,7 +578,7 @@ public class VistaCuidades extends javax.swing.JFrame {
                 txtnombreKeyTyped(evt);
             }
         });
-        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 240, 160, 40));
+        getContentPane().add(txtnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 180, 160, 40));
 
         txtpoblacion.setForeground(new java.awt.Color(153, 153, 153));
         txtpoblacion.setText("Ingresa la población");
@@ -581,14 +608,14 @@ public class VistaCuidades extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Id", "Nombre", "Codigo Pais", "Poblacion"
+                "Id", "Nombre", "Distrito", "Codigo Pais", "Poblacion"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -603,7 +630,7 @@ public class VistaCuidades extends javax.swing.JFrame {
         jTable1.setInheritsPopupMenu(true);
         jScrollPane1.setViewportView(jTable1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 80, 560, 399));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 80, 560, 399));
 
         btnagregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Agregar.png"))); // NOI18N
         btnagregar.setBorder(null);
@@ -627,7 +654,7 @@ public class VistaCuidades extends javax.swing.JFrame {
                 btnconsultarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnconsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 510, 140, 50));
+        getContentPane().add(btnconsultar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 490, 140, 50));
 
         btnmodificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Modificar.png"))); // NOI18N
         btnmodificar.setBorder(null);
@@ -639,7 +666,7 @@ public class VistaCuidades extends javax.swing.JFrame {
                 btnmodificarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 510, 130, 50));
+        getContentPane().add(btnmodificar, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 490, 130, 50));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/sonido.png"))); // NOI18N
         jButton1.setBorder(null);
@@ -660,7 +687,7 @@ public class VistaCuidades extends javax.swing.JFrame {
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/Papulandia.png"))); // NOI18N
         jLabel8.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 490, 100, 110));
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 490, 100, 110));
 
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/FOndooo.png"))); // NOI18N
@@ -738,7 +765,7 @@ public class VistaCuidades extends javax.swing.JFrame {
                     txtcodigo.setForeground(new Color(153, 153, 153));
                     txtnombre.setText("Ingresa el nombre");
                     txtnombre.setForeground(new Color(153, 153, 153));
-                    
+
                     txtcontinente.setText("Ingresa el código de pais");
                     txtcontinente.setForeground(new Color(153, 153, 153));
                     txtpoblacion.setText("Ingresa la población");
@@ -874,16 +901,16 @@ public class VistaCuidades extends javax.swing.JFrame {
         // Convertir el índice de la vista al índice del modelo (por si la tabla está ordenada)
         int filaModelo = jTable1.convertRowIndexToModel(filaSeleccionada);
 
-        // 3. Obtener el ID ORIGINAL (PK) de la tabla
+        // 3. Obtener el ID ORIGINAL (PK) y el Distrito Original de la tabla
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-        // El ID está en la columna 0
         String idOriginal = modelo.getValueAt(filaModelo, 0).toString();
+        String distritoOriginal = modelo.getValueAt(filaModelo, 2).toString(); // Columna 2 es Distrito
 
         // 4. Obtener los NUEVOS valores de los campos de texto
-        String idNuevo = txtcodigo.getText();
+        String idNuevo = txtcodigo.getText(); // ID
         String nombreNuevo = txtnombre.getText();
-        String codigoPaisNuevo = txtcontinente.getText(); // txtcontinente es CountryCode
-        String poblacionNueva = txtpoblacion.getText();
+        String codigoPaisNuevo = txtcontinente.getText(); // CountryCode
+        String poblacionNueva = txtpoblacion.getText(); // Population
 
         // 5. Validar que los campos no estén vacíos
         if (idNuevo.isEmpty() || idNuevo.equals("Ingresa el ID")
@@ -900,19 +927,21 @@ public class VistaCuidades extends javax.swing.JFrame {
         try {
             miConexion = Conexion.getConnection();
 
-            // 7. Preparar la consulta SQL UPDATE (CORREGIDA para 'city')
-            String sql = "UPDATE city SET ID = ?, Name = ?, CountryCode = ?, Population = ? WHERE ID = ?";
+            // 7. Preparar la consulta SQL UPDATE (INCLUYENDO DISTRICT)
+            // La tabla city tiene columnas: ID, Name, CountryCode, District, Population.
+            String sql = "UPDATE city SET ID = ?, Name = ?, CountryCode = ?, District = ?, Population = ? WHERE ID = ?";
 
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
 
                 // 8. Asignar los NUEVOS valores (columnas SET)
                 pstmt.setInt(1, Integer.parseInt(idNuevo));
                 pstmt.setString(2, nombreNuevo);
-                pstmt.setString(3, codigoPaisNuevo);
-                pstmt.setInt(4, Integer.parseInt(poblacionNueva));
+                pstmt.setString(3, codigoPaisNuevo.trim());
+                pstmt.setString(4, distritoOriginal); // Usamos el valor original del Distrito que se muestra en la tabla.
+                pstmt.setInt(5, Integer.parseInt(poblacionNueva));
 
                 // 9. Asignar el ID ORIGINAL (columna WHERE)
-                pstmt.setInt(5, Integer.parseInt(idOriginal));
+                pstmt.setInt(6, Integer.parseInt(idOriginal));
 
                 int filasAfectadas = pstmt.executeUpdate();
 
@@ -941,6 +970,8 @@ public class VistaCuidades extends javax.swing.JFrame {
             String mensajeError = e.getMessage();
             if (mensajeError.contains("Duplicate entry")) {
                 JOptionPane.showMessageDialog(this, "Error: El nuevo ID '" + idNuevo + "' ya existe en la BD.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
+            } else if (mensajeError.contains("foreign key constraint fails")) {
+                JOptionPane.showMessageDialog(this, "Error: El código de país '" + codigoPaisNuevo + "' no existe en la tabla de países (country).", "Error de Clave Foránea", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error al modificar en la base de datos: " + mensajeError, "Error SQL", JOptionPane.ERROR_MESSAGE);
             }
@@ -951,8 +982,6 @@ public class VistaCuidades extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-
-
     }//GEN-LAST:event_btnmodificarActionPerformed
 
     private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
@@ -1046,6 +1075,30 @@ public class VistaCuidades extends javax.swing.JFrame {
         this.dispose();         // TODO add your handling code here:
     }//GEN-LAST:event_btnPaisesActionPerformed
 
+    private void txtcodigo1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigo1FocusGained
+        // TODO add your handling code here:
+        if (txtcodigo1.getText().equals("Ingresa el Distrito")) {
+            txtcodigo1.setText("");
+            txtcodigo1.setForeground(new Color(0, 0, 0));
+        }
+    }//GEN-LAST:event_txtcodigo1FocusGained
+
+    private void txtcodigo1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtcodigo1FocusLost
+        // TODO add your handling code here:
+        if (txtcodigo1.getText().equals("")) {
+            txtcodigo1.setText("Ingresa el Distrito");
+            txtcodigo1.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_txtcodigo1FocusLost
+
+    private void txtcodigo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigo1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtcodigo1ActionPerformed
+
+    private void txtcodigo1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigo1KeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtcodigo1KeyTyped
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrarSesion;
@@ -1065,6 +1118,7 @@ public class VistaCuidades extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -1072,6 +1126,7 @@ public class VistaCuidades extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JButton minBtn;
     private javax.swing.JTextField txtcodigo;
+    private javax.swing.JTextField txtcodigo1;
     private javax.swing.JTextField txtcontinente;
     private javax.swing.JTextField txtnombre;
     private javax.swing.JTextField txtpoblacion;
