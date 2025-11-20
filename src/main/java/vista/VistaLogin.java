@@ -15,57 +15,51 @@ import java.net.URI;
 import conn.Conexion;
 import java.security.MessageDigest;
 // Importa las clases necesarias de SQL
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
-
 
 /**
  *
  * @author Fram
  */
-
 public class VistaLogin extends javax.swing.JFrame {
+
     public void playSound(String Click) {
-    try {
-        
-        AudioInputStream audioStream = AudioSystem.getAudioInputStream(
-            getClass().getResource("/sounds/" + Click)
-        );
+        try {
 
-        
-        Clip soundClip = AudioSystem.getClip();
-        soundClip.open(audioStream);
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(
+                    getClass().getResource("/sounds/" + Click)
+            );
 
-        
-        soundClip.start(); 
+            Clip soundClip = AudioSystem.getClip();
+            soundClip.open(audioStream);
 
-    } catch (Exception ex) {
-        System.out.println("Error al reproducir el sonido: " + ex.getMessage());
+            soundClip.start();
+
+        } catch (Exception ex) {
+            System.out.println("Error al reproducir el sonido: " + ex.getMessage());
+        }
     }
-}
     /**
      * Creates new form VistaLogin
      */
     private Clip clipMusica;
     private boolean musicaSonando = false;
+
     private void cargarMusicaDeFondo() {
-    try {
-        // Busca el archivo en la carpeta de recursos
-        AudioInputStream audioStream = AudioSystem.getAudioInputStream(
-            getClass().getResource("/sounds/fondo.wav") // <-- ¡CAMBIA ESTO por el nombre de tu archivo!
-        );
-        clipMusica = AudioSystem.getClip();
-        clipMusica.open(audioStream);
-    } catch (Exception ex) {
-        System.out.println("Error al cargar la música de fondo: " + ex.getMessage());
+        try {
+            // Busca el archivo en la carpeta de recursos
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(
+                    getClass().getResource("/sounds/fondo.wav") // <-- ¡CAMBIA ESTO por el nombre de tu archivo!
+            );
+            clipMusica = AudioSystem.getClip();
+            clipMusica.open(audioStream);
+        } catch (Exception ex) {
+            System.out.println("Error al cargar la música de fondo: " + ex.getMessage());
+        }
     }
-}
     int xMouse, yMouse;
     private int papulandiaClickCount = 0;
+
     public VistaLogin() {
         initComponents();
         cargarMusicaDeFondo();
@@ -76,26 +70,9 @@ public class VistaLogin extends javax.swing.JFrame {
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/icons/Papulandia2.png")).getImage());
         this.getRootPane().setDefaultButton(btnlogin);
         establecerCursorPersonalizado();
-        
+
     }
-    private static class Seguridad {
-        public static String sha256(String input) {
-            try {
-                MessageDigest md = MessageDigest.getInstance("SHA-256");
-                byte[] hash = md.digest(input.getBytes("UTF-8"));
-                StringBuilder hexString = new StringBuilder();
-                for (byte b : hash) {
-                    String hex = Integer.toHexString(0xff & b);
-                    if (hex.length() == 1) hexString.append('0');
-                    hexString.append(hex);
-                }
-                return hexString.toString();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-    
+
     private void login() {
         playSound("Click.wav");
         String user = txtusuario1.getText().trim();
@@ -107,86 +84,71 @@ public class VistaLogin extends javax.swing.JFrame {
             return;
         }
 
-        String passHash = Seguridad.sha256(password);
+        // --- CAMBIO AQUÍ: Usamos el DAO ---
+        Dao.LoginDao dao = new Dao.LoginDao();
+        boolean esValido = dao.autenticar(user, password);
 
-        try {
-            Connection conn = Conexion.getConnection(); // Tu clase conn.Conexion
-            String sql = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena_hash = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, user);
-            ps.setString(2, passHash);
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                // Usuario válido
-                VistaPaises vista = new VistaPaises();
-                if (clipMusica != null && clipMusica.isRunning()) {
-                    clipMusica.stop();
-                }
-                vista.setVisible(true);
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Revisa tus credenciales!", "Error de contraseña", JOptionPane.ERROR_MESSAGE);
+        if (esValido) {
+            // Usuario válido
+            VistaPaises vista = new VistaPaises();
+            if (clipMusica != null && clipMusica.isRunning()) {
+                clipMusica.stop();
             }
-
-            rs.close();
-            ps.close();
-            conn.close();
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos:\n" + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
+            vista.setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Revisa tus credenciales!", "Error de contraseña", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void establecerCursorPersonalizado() {
-    try {
-        // 1. Obten el Toolkit, que es la caja de herramientas de AWT
-        java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
+        try {
+            // 1. Obten el Toolkit, que es la caja de herramientas de AWT
+            java.awt.Toolkit toolkit = java.awt.Toolkit.getDefaultToolkit();
 
-        // 2. Carga tu imagen desde los recursos
-        java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png"); // <-- ¡Asegúrate de que el nombre del archivo sea correcto!
-        java.awt.Image imagenCursor = new javax.swing.ImageIcon(urlDeLaImagen).getImage();
+            // 2. Carga tu imagen desde los recursos
+            java.net.URL urlDeLaImagen = getClass().getResource("/icons/Mouse.png"); // <-- ¡Asegúrate de que el nombre del archivo sea correcto!
+            java.awt.Image imagenCursor = new javax.swing.ImageIcon(urlDeLaImagen).getImage();
 
-        // 3. Define el "HotSpot" (el punto exacto del cursor que hace clic)
-        // Para la mayoría de los cursores, el punto (0, 0) que es la esquina superior izquierda, funciona bien.
-        java.awt.Point hotSpot = new java.awt.Point(0, 0);
+            // 3. Define el "HotSpot" (el punto exacto del cursor que hace clic)
+            // Para la mayoría de los cursores, el punto (0, 0) que es la esquina superior izquierda, funciona bien.
+            java.awt.Point hotSpot = new java.awt.Point(0, 0);
 
-        // 4. Crea el objeto Cursor personalizado
-        java.awt.Cursor cursorPersonalizado = toolkit.createCustomCursor(
-            imagenCursor, 
-            hotSpot, 
-            "CursorAero" // Un nombre descriptivo para tu cursor
-        );
-        jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            papulandiaClickCount++; // Incrementa el contador con cada clic
+            // 4. Crea el objeto Cursor personalizado
+            java.awt.Cursor cursorPersonalizado = toolkit.createCustomCursor(
+                    imagenCursor,
+                    hotSpot,
+                    "CursorAero" // Un nombre descriptivo para tu cursor
+            );
+            jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    papulandiaClickCount++; // Incrementa el contador con cada clic
 
-            // Si el contador llega a 3...
-            if (papulandiaClickCount == 3) {
-                try {
-                    // ...intenta abrir el enlace en el navegador
-                    Desktop.getDesktop().browse(new URI("https://www.youtube.com/watch?v=b57ueUYyQ9Y"));
-                } catch (Exception ex) {
-                    // Si algo sale mal, imprime un error en la consola
-                    System.out.println("No se pudo abrir el enlace: " + ex.getMessage());
+                    // Si el contador llega a 3...
+                    if (papulandiaClickCount == 3) {
+                        try {
+                            // ...intenta abrir el enlace en el navegador
+                            Desktop.getDesktop().browse(new URI("https://www.youtube.com/watch?v=b57ueUYyQ9Y"));
+                        } catch (Exception ex) {
+                            // Si algo sale mal, imprime un error en la consola
+                            System.out.println("No se pudo abrir el enlace: " + ex.getMessage());
+                        }
+
+                        // Reinicia el contador para que se pueda volver a activar
+                        papulandiaClickCount = 0;
+                    }
                 }
-                
-                // Reinicia el contador para que se pueda volver a activar
-                papulandiaClickCount = 0; 
-            }
+            });
+
+            // 5. Aplica el cursor a TODA la ventana (JFrame)
+            this.setCursor(cursorPersonalizado);
+
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
+            // Si falla, se mantendrá el cursor por defecto del sistema.
         }
-    });
-
-
-        // 5. Aplica el cursor a TODA la ventana (JFrame)
-        this.setCursor(cursorPersonalizado);
-
-    } catch (Exception e) {
-        System.out.println("No se pudo cargar el cursor personalizado: " + e.getMessage());
-        // Si falla, se mantendrá el cursor por defecto del sistema.
     }
-}
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -364,7 +326,7 @@ public class VistaLogin extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-      
+
     private void btnloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnloginActionPerformed
         login();
     }//GEN-LAST:event_btnloginActionPerformed
@@ -378,7 +340,7 @@ public class VistaLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_extBtnActionPerformed
 
     private void extBtnKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_extBtnKeyPressed
-     // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_extBtnKeyPressed
 
     private void minBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minBtnActionPerformed
@@ -386,25 +348,25 @@ public class VistaLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_minBtnActionPerformed
 
     private void txtusuario1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtusuario1MousePressed
-        if (txtusuario1.getText().equals("Ingrese su nombre de usuario")){
+        if (txtusuario1.getText().equals("Ingrese su nombre de usuario")) {
             txtusuario1.setText("");
-            txtusuario1.setForeground(Color.black);  
+            txtusuario1.setForeground(Color.black);
         }
-        if (String.valueOf(txtpassword.getPassword()).isEmpty()){
+        if (String.valueOf(txtpassword.getPassword()).isEmpty()) {
             txtpassword.setText("********");
             txtpassword.setForeground(Color.GRAY);
         }
     }//GEN-LAST:event_txtusuario1MousePressed
 
     private void txtpasswordMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtpasswordMousePressed
-        if (String.valueOf(txtpassword.getPassword()).equals("********")){
+        if (String.valueOf(txtpassword.getPassword()).equals("********")) {
             txtpassword.setText("");
             txtpassword.setForeground(Color.BLACK);
-           }     
-        if (txtusuario1.getText().isEmpty()){
+        }
+        if (txtusuario1.getText().isEmpty()) {
             txtusuario1.setText("Ingrese su nombre de usuario");
-            txtusuario1.setForeground(Color.gray); 
-            }  
+            txtusuario1.setForeground(Color.gray);
+        }
     }//GEN-LAST:event_txtpasswordMousePressed
 
     private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
@@ -415,28 +377,28 @@ public class VistaLogin extends javax.swing.JFrame {
     private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
         int x = evt.getXOnScreen();
         int y = evt.getYOnScreen();
-        this.setLocation(x - xMouse,y - yMouse);        // TODO add your handling code here:
+        this.setLocation(x - xMouse, y - yMouse);        // TODO add your handling code here:
     }//GEN-LAST:event_jPanel1MouseDragged
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-     if (clipMusica != null) {
-        // Si la música está sonando...
-        if (musicaSonando) {
-            // ... la detenemos.
-            clipMusica.stop();
-            // Opcional: Cambia el texto del botón para que el usuario sepa
-            // btnMusica.setText("Activar Música");
-        } else {
-            // Si no está sonando...
-            // ... la iniciamos para que se repita continuamente.
-            clipMusica.loop(Clip.LOOP_CONTINUOUSLY);
-            // Opcional: Cambia el texto del botón
-            // btnMusica.setText("Desactivar Música");
+        if (clipMusica != null) {
+            // Si la música está sonando...
+            if (musicaSonando) {
+                // ... la detenemos.
+                clipMusica.stop();
+                // Opcional: Cambia el texto del botón para que el usuario sepa
+                // btnMusica.setText("Activar Música");
+            } else {
+                // Si no está sonando...
+                // ... la iniciamos para que se repita continuamente.
+                clipMusica.loop(Clip.LOOP_CONTINUOUSLY);
+                // Opcional: Cambia el texto del botón
+                // btnMusica.setText("Desactivar Música");
+            }
+            // Invertimos el estado
+            musicaSonando = !musicaSonando;
         }
-        // Invertimos el estado
-        musicaSonando = !musicaSonando;
-    }
-   // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

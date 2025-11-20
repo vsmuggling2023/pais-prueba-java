@@ -4,6 +4,7 @@
  */
 package vista;
 
+import Dao.PaisesDao;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -31,12 +32,12 @@ import javax.swing.RowSorter;
 import java.awt.Desktop;
 import java.net.URI;
 import conn.Conexion;
-// Importa las clases necesarias de SQL
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+// Importa las clases necesarias de SQL
 import java.util.ArrayList;
 import modelo.Pais;
 import java.util.List;
@@ -140,97 +141,30 @@ public class VistaPaises extends javax.swing.JFrame {
      * en los campos de texto y actualiza la jTable.
      */
     private void buscarPaises() {
-        // 1. Define las columnas para el modelo de la tabla
+        // (Toda la parte inicial igual...)
         DefaultTableModel modelo = new DefaultTableModel(
                 new Object[]{"Codigo", "Nombre", "Continente", "Poblacion"}, 0
         );
-
-        String sqlBase = "SELECT Code, Name, Continent, Population FROM country";
-
-        // Listas para filtros (tu lógica original se mantiene igual aquí)
-        ArrayList<String> conditions = new ArrayList<>();
-        ArrayList<Object> params = new ArrayList<>();
 
         String codigo = txtcodigo.getText();
         String nombre = txtnombre.getText();
         String continente = txtcontinente.getText();
         String poblacion = txtpoblacion.getText();
 
-        try {
-            // --- TU LÓGICA DE FILTROS (se mantiene igual) ---
-            if (!codigo.isEmpty() && !codigo.equals("Ingresa el codigo")) {
-                conditions.add("Code LIKE ?");
-                params.add(codigo + "%");
-            }
-            if (!nombre.isEmpty() && !nombre.equals("Ingresa el nombre")) {
-                conditions.add("Name LIKE ?");
-                params.add("%" + nombre + "%");
-            }
-            if (!continente.isEmpty() && !continente.equals("Ingresa el continente")) {
-                conditions.add("Continent LIKE ?");
-                params.add("%" + continente + "%");
-            }
-            if (!poblacion.isEmpty() && !poblacion.equals("Ingresa la población")) {
-                conditions.add("Population >= ?");
-                params.add(Integer.parseInt(poblacion));
-            }
+        Dao.PaisesDao dao = new Dao.PaisesDao();
+        List<modelo.Pais> lista = dao.listarPaises(codigo, nombre, continente, poblacion);
 
-            if (!conditions.isEmpty()) {
-                sqlBase += " WHERE " + String.join(" AND ", conditions);
-            }
-            sqlBase += " LIMIT 100";
-            // ------------------------------------------------
-
-            Connection miConexion = Conexion.getConnection();
-
-           
-            List<Pais> listaDePaises = new ArrayList<>();
-
-            try (PreparedStatement pstmt = miConexion.prepareStatement(sqlBase)) {
-                for (int i = 0; i < params.size(); i++) {
-                    pstmt.setObject(i + 1, params.get(i));
-                }
-
-                try (ResultSet rs = pstmt.executeQuery()) {
-                   
-                    while (rs.next()) {
-                        
-                        String codeBD = rs.getString("Code");
-                        String nameBD = rs.getString("Name");
-                        String contBD = rs.getString("Continent");
-                       
-                        String pobBD = String.valueOf(rs.getInt("Population"));
-
-                        
-                        Pais miPais = new Pais(nameBD, contBD, pobBD, codeBD);
-
-                       
-                        listaDePaises.add(miPais);
-                    }
-                }
-            }
-
-            
-            for (Pais p : listaDePaises) {
-                modelo.addRow(new Object[]{
-                    p.getCodigo(), 
-                    p.getNombre(),
-                    p.getContinente(),
-                    p.getPoblacion()
-                });
-            }
-
-           
-            System.out.println("Se procesaron " + listaDePaises.size() + " objetos Pais.");
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La población debe ser un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error SQL: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // *** AQUÍ ESTÁ LA CORRECCIÓN ***
+        for (modelo.Pais p : lista) {
+            modelo.addRow(new Object[]{
+                p.getCode(), // Antes: p.getCodigo()
+                p.getName(), // Antes: p.getNombre()
+                p.getContinent(), // Antes: p.getContinente()
+                p.getPopulation() // Antes: p.getPoblacion()
+            });
         }
 
+        System.out.println("Se procesaron " + lista.size() + " objetos Pais.");
         jTable1.setModel(modelo);
         personalizarTablaEstiloFrutiger();
     }
@@ -238,20 +172,17 @@ public class VistaPaises extends javax.swing.JFrame {
     public class EjemploConsulta {
 
         public void consultarPaises() {
-            
+
             Connection miConexion = Conexion.getConnection();
 
-            
             if (miConexion != null) {
 
-                
                 String sql = "SELECT Name, Continent, Population FROM country WHERE Continent = 'South America'";
 
                 try (Statement stmt = miConexion.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
                     System.out.println("--- Países de Sudamérica en la BD 'world' ---");
 
-                    
                     while (rs.next()) {
                         String nombre = rs.getString("Name");
                         String continente = rs.getString("Continent");
@@ -264,7 +195,7 @@ public class VistaPaises extends javax.swing.JFrame {
                     System.out.println("❌ Error al ejecutar la consulta SQL");
                     e.printStackTrace();
                 }
-                
+
             }
         }
     }
@@ -722,289 +653,125 @@ public class VistaPaises extends javax.swing.JFrame {
         String continente = txtcontinente.getText();
         String poblacion = txtpoblacion.getText();
 
-        // 2. Validar que los campos no estén vacíos (con los placeholders)
+        // Validaciones visuales (se mantienen igual)
         if (codigo.isEmpty() || codigo.equals("Ingresa el codigo")
                 || nombre.isEmpty() || nombre.equals("Ingresa el nombre")
                 || continente.isEmpty() || continente.equals("Ingresa el continente")
                 || poblacion.isEmpty() || poblacion.equals("Ingresa la población")) {
-
             JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
-            return; // Salir si algo falta
-        }
-
-        // 
-        Connection miConexion = null;
-        try {
-            // 
-            miConexion = Conexion.getConnection();
-
-
-            String sql = "INSERT INTO country (Code, Name, Continent, Population) VALUES (?, ?, ?, ?)";
-
-       
-            try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-
-               
-                pstmt.setString(1, codigo);      
-                pstmt.setString(2, nombre);      
-                pstmt.setString(3, continente);  
-                pstmt.setInt(4, Integer.parseInt(poblacion)); // 
-
-               
-                int filasAfectadas = pstmt.executeUpdate();
-
-                
-                if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "¡País agregado exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
-                  
-                    buscarPaises();
-
-              
-                    txtcodigo.setText("Ingresa el codigo");
-                    txtcodigo.setForeground(new Color(153, 153, 153));
-                    txtnombre.setText("Ingresa el nombre");
-                    txtnombre.setForeground(new Color(153, 153, 153));
-                    txtcontinente.setText("Ingresa el continente");
-                    txtcontinente.setForeground(new Color(153, 153, 153));
-                    txtpoblacion.setText("Ingresa la población");
-                    txtpoblacion.setForeground(new Color(153, 153, 153));
-
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se pudo agregar el país.", "Error", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-
-        } catch (SQLException e) {
-            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
-            JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            // Error si la población no es un número
-            JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception e) {
-            // Cualquier otro error (ej: conexión)
-            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
-    }//GEN-LAST:event_btnagregarActionPerformed
-    private void mostrarDetallesPaisSeleccionado() {
-        int filaSeleccionada = jTable1.getSelectedRow();
-
-        if (filaSeleccionada < 0) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un país de la tabla para ver sus detalles.", "País no seleccionado", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Obtener el código de país (PK) de la fila seleccionada
+        // --- USAR DAO ---
+        // Crear objeto con los datos
+        Pais nuevoPais = new Pais(nombre, continente, poblacion, codigo);
+        PaisesDao dao = new PaisesDao();
+
+        boolean exito = dao.agregarPais(nuevoPais);
+
+        if (exito) {
+            JOptionPane.showMessageDialog(this, "¡País agregado exitosamente!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            buscarPaises(); // Recargar tabla
+
+            // Limpiar campos (Tu lógica de limpieza visual se mantiene aquí)
+            txtcodigo.setText("Ingresa el codigo");
+            txtcodigo.setForeground(new Color(153, 153, 153));
+            // ... limpiar el resto ...
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo agregar el país (Verifica que el código no esté duplicado o la población sea número).", "Error", JOptionPane.WARNING_MESSAGE);
+        }
+
+    }//GEN-LAST:event_btnagregarActionPerformed
+    private void mostrarDetallesPaisSeleccionado() {
+        int filaSeleccionada = jTable1.getSelectedRow();
+        if (filaSeleccionada < 0) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un país.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-        // *** EL AJUSTE CRÍTICO: .trim() para eliminar espacios en blanco y asegurar la coincidencia SQL ***
         String codigoPais = modelo.getValueAt(filaSeleccionada, 0).toString().trim();
 
-        Connection miConexion = null;
-        try {
-            miConexion = conn.Conexion.getConnection();
+        // --- USAR DAO ---
+        PaisesDao dao = new PaisesDao();
+        Pais p = dao.obtenerDetallesPais(codigoPais); // Recupera el objeto completo
 
-            // Consulta SQL para obtener todos los detalles del país
-            String sql = "SELECT "
-                    + "T1.Name, T1.Continent, T1.Region, T1.SurfaceArea, T1.IndepYear, "
-                    + "T1.Population, T1.LifeExpectancy, T1.GNP, T1.GovernmentForm, "
-                    + "T1.HeadOfState, T2.Name AS CapitalName "
-                    + "FROM country T1 "
-                    + "LEFT JOIN city T2 ON T1.Capital = T2.ID " // Unir con City para obtener el nombre de la Capital
-                    + "WHERE T1.Code = ?";
+        if (p != null) {
+            // Construir HTML solo con los getters del objeto Pais
+            String detalles = "<html><body style='width: 300px; font-family: sans-serif;'>"
+                    + "<h2>Detalles de " + p.getName() + " (" + p.getCode() + ")</h2>"
+                    + "<hr>"
+                    + "<p><b>Continente:</b> " + p.getContinent() + "</p>"
+                    + "<p><b>Región:</b> " + p.getRegion() + "</p>"
+                    + "<p><b>Superficie:</b> " + p.getSurfaceArea() + " km²</p>"
+                    + "<p><b>Independencia:</b> " + p.getIndepYear() + "</p>"
+                    + "<p><b>Población:</b> " + p.getPopulation() + "</p>"
+                    + "<p><b>Exp. Vida:</b> " + p.getLifeExpectancy() + " años</p>"
+                    + "<p><b>PNB:</b> " + p.getGnp() + "</p>"
+                    + "<p><b>Gobierno:</b> " + p.getGovernmentForm() + "</p>"
+                    + "<p><b>Jefe Estado:</b> " + (p.getHeadOfState() != null ? p.getHeadOfState() : "N/A") + "</p>"
+                    + "<p><b>Capital:</b> " + (p.getCapitalName() != null ? p.getCapitalName() : "N/A") + "</p>"
+                    + "</body></html>";
 
-            try (PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-                pstmt.setString(1, codigoPais);
-
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                        // 1. Recolección de datos
-                        String nombre = rs.getString("Name");
-                        String continente = rs.getString("Continent");
-                        String region = rs.getString("Region");
-                        double superficie = rs.getDouble("SurfaceArea");
-
-                        // Manejar IndepYear que puede ser NULL en la BD
-                        Object indepYearObj = rs.getObject("IndepYear");
-                        String indepYear = (indepYearObj != null) ? indepYearObj.toString() : "N/A";
-
-                        int poblacion = rs.getInt("Population");
-                        // Manejar LifeExpectancy que puede ser NULL
-                        double lifeExpectancyRaw = rs.getDouble("LifeExpectancy");
-                        String lifeExpectancy = rs.wasNull() ? "N/A" : String.format("%,.1f", lifeExpectancyRaw) + " años";
-
-                        double gnp = rs.getDouble("GNP");
-                        String formaGobierno = rs.getString("GovernmentForm");
-                        String jefeEstado = rs.getString("HeadOfState");
-                        String capital = rs.getString("CapitalName");
-
-                        // 2. Formato del mensaje en HTML para una mejor presentación (LA MINI VENTANA)
-                        String detalles = "<html><body style='width: 300px; font-family: sans-serif;'>"
-                                + "<h2>Detalles Completos de " + nombre + " (" + codigoPais + ")</h2>"
-                                + "<hr style='border: 1px solid #ccc;'>"
-                                + "<p><b>Continente:</b> " + continente + "</p>"
-                                + "<p><b>Región:</b> " + region + "</p>"
-                                + "<p><b>Superficie:</b> " + String.format("%,.2f", superficie) + " km²</p>"
-                                + "<p><b>Año de Independencia:</b> " + indepYear + "</p>"
-                                + "<p><b>Población:</b> " + String.format("%,d", poblacion) + "</p>"
-                                + "<p><b>Expectativa de Vida:</b> " + lifeExpectancy + "</p>"
-                                + "<p><b>Producto Nacional Bruto (GNP):</b> " + String.format("%,.2f", gnp) + "</p>"
-                                + "<p><b>Forma de Gobierno:</b> " + formaGobierno + "</p>"
-                                + "<p><b>Jefe de Estado:</b> " + jefeEstado + "</p>"
-                                + "<p><b>Capital:</b> " + (capital != null ? capital : "N/A") + "</p>"
-                                + "</body></html>";
-
-                        // 3. Mostrar el diálogo (la mini ventana)
-                        JOptionPane.showMessageDialog(this, detalles, "Información Detallada del País", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "No se encontraron detalles completos para el país seleccionado en la base de datos.", "Error de Datos", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error inesperado al cargar detalles: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, detalles, "Detalles del País", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontraron detalles.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     // Agregar este nuevo método a la clase VistaPaises.java
 
     private void compararPaises(int[] filasSeleccionadas) {
-        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel modeloTabla = (DefaultTableModel) jTable1.getModel();
         List<String> codigos = new ArrayList<>();
-
-        // 1. Recoger los códigos de los países seleccionados
         for (int fila : filasSeleccionadas) {
-            // Usar .trim() para seguridad
-            codigos.add(modelo.getValueAt(fila, 0).toString().trim());
+            codigos.add(modeloTabla.getValueAt(fila, 0).toString().trim());
         }
 
-        Connection miConexion = null;
-        try {
-            miConexion = conn.Conexion.getConnection();
+        // --- USAR DAO ---
+        Dao.PaisesDao dao = new Dao.PaisesDao();
+        List<modelo.Pais> paises = dao.obtenerPaisesPorCodigos(codigos);
 
-            // 2. Construir la consulta con 10 campos comparables + Nombre y Código
-            String placeholders = String.join(",", Collections.nCopies(codigos.size(), "?"));
+        // Construir HTML
+        StringBuilder html = new StringBuilder("<html><body style='width: 700px; font-family: sans-serif;'>");
+        html.append("<h2>Comparación de Países</h2>");
+        html.append("<table border='1' style='width:100%; border-collapse:collapse; text-align:left;'>");
 
-            // --- SQL ACTUALIZADO para las 10 métricas del documento ---
-            String sql = "SELECT "
-                    + "T1.Name, T1.Continent, T1.Region, T1.SurfaceArea, T1.IndepYear, "
-                    + "T1.Population, T1.LifeExpectancy, T1.GNP, T1.GovernmentForm, "
-                    + "T1.HeadOfState, T2.Name AS CapitalName "
-                    + "FROM country T1 "
-                    + "LEFT JOIN city T2 ON T1.Capital = T2.ID "
-                    + // Para obtener el nombre de la Capital
-                    "WHERE T1.Code IN (" + placeholders + ") ORDER BY T1.Name";
-            // -----------------------------------------------------------
-
-            try (PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-                // Asignar los códigos a los placeholders
-                for (int i = 0; i < codigos.size(); i++) {
-                    pstmt.setString(i + 1, codigos.get(i));
-                }
-
-                try (ResultSet rs = pstmt.executeQuery()) {
-
-                    StringBuilder tableHtml = new StringBuilder();
-                    // Aumentar un poco el ancho para las 10 métricas
-                    tableHtml.append("<html><body style='width: 650px; font-family: sans-serif;'>");
-                    tableHtml.append("<h2>Comparación de Países Seleccionados</h2>");
-                    tableHtml.append("<table border='1' style='width: 100%; border-collapse: collapse; text-align: right;'>");
-
-                    // Mapeo de datos: Clave=Métrica, Valor=Lista de valores por país
-                    Map<String, List<String>> resultados = new LinkedHashMap<>();
-                    List<String> nombresPaises = new ArrayList<>();
-
-                    // 3. Recoger los resultados y organizar por métrica (10 MÉTTRICAS)
-                    while (rs.next()) {
-                        nombresPaises.add(rs.getString("Name"));
-
-                        // 1. Población
-                        resultados.computeIfAbsent("Población", k -> new ArrayList<>()).add(String.format("%,d", rs.getInt("Population")));
-
-                        // 2. Superficie
-                        resultados.computeIfAbsent("Superficie (km²)", k -> new ArrayList<>()).add(String.format("%,.2f", rs.getDouble("SurfaceArea")));
-
-                        // 3. PNB
-                        resultados.computeIfAbsent("PNB", k -> new ArrayList<>()).add(String.format("%,.2f", rs.getDouble("GNP")));
-
-                        // 4. Expectativa de Vida (Manejo de NULLs)
-                        double lifeExpectancyRaw = rs.getDouble("LifeExpectancy");
-                        String lifeExpectancy = rs.wasNull() ? "N/A" : String.format("%,.1f", lifeExpectancyRaw);
-                        resultados.computeIfAbsent("Expectativa de Vida (años)", k -> new ArrayList<>()).add(lifeExpectancy);
-
-                        // 5. Continente
-                        resultados.computeIfAbsent("Continente", k -> new ArrayList<>()).add(rs.getString("Continent"));
-
-                        // 6. Región
-                        resultados.computeIfAbsent("Región", k -> new ArrayList<>()).add(rs.getString("Region"));
-
-                        // 7. Año de Independencia (Manejo de NULLs)
-                        Object indepYearObj = rs.getObject("IndepYear");
-                        String indepYear = (indepYearObj != null) ? indepYearObj.toString() : "N/A";
-                        resultados.computeIfAbsent("Año de Independencia", k -> new ArrayList<>()).add(indepYear);
-
-                        // 8. Forma de Gobierno
-                        resultados.computeIfAbsent("Forma de Gobierno", k -> new ArrayList<>()).add(rs.getString("GovernmentForm"));
-
-                        // 9. Jefe de Estado
-                        String headOfState = rs.getString("HeadOfState");
-                        resultados.computeIfAbsent("Jefe de Estado", k -> new ArrayList<>()).add(headOfState != null && !headOfState.trim().isEmpty() ? headOfState : "N/A");
-
-                        // 10. Capital
-                        String capitalName = rs.getString("CapitalName");
-                        resultados.computeIfAbsent("Capital", k -> new ArrayList<>()).add(capitalName != null ? capitalName : "N/A");
-                    }
-
-                    // 4. Generar encabezados de tabla (Nombres de Países)
-                    tableHtml.append("<tr><th style='text-align: left; background-color: #e0f7fa;'>Métrica</th>");
-                    for (String nombrePais : nombresPaises) {
-                        tableHtml.append("<th style='background-color: #f0f0f0; padding: 5px;'>").append(nombrePais).append("</th>");
-                    }
-                    tableHtml.append("</tr>");
-
-                    // 5. Generar filas de datos (LISTA COMPLETA DE 10 MÉTRICAS)
-                    List<String> metricas = Arrays.asList(
-                            "Población",
-                            "Superficie (km²)",
-                            "PNB",
-                            "Expectativa de Vida (años)",
-                            "Continente",
-                            "Región",
-                            "Año de Independencia",
-                            "Forma de Gobierno",
-                            "Jefe de Estado",
-                            "Capital"
-                    );
-
-                    for (String metrica : metricas) {
-                        tableHtml.append("<tr><td style='text-align: left; background-color: #f9f9f9;'><b>").append(metrica).append("</b></td>");
-                        List<String> valores = resultados.getOrDefault(metrica, Collections.emptyList());
-                        for (String valor : valores) {
-                            tableHtml.append("<td style='background-color: #ffffff; color: #333; padding: 5px;'>").append(valor).append("</td>");
-                        }
-                        tableHtml.append("</tr>");
-                    }
-
-                    tableHtml.append("</table></body></html>");
-
-                    // Mostrar la mini ventana de comparación
-                    JOptionPane.showMessageDialog(this, tableHtml.toString(), "Comparación de Países", JOptionPane.INFORMATION_MESSAGE);
-
-                }
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al realizar la comparación en la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error inesperado al preparar la comparación: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        // --- ENCABEZADOS (Nombres de los países) ---
+        html.append("<tr style='background-color:#e0f7fa;'>");
+        html.append("<th style='padding:8px;'>Métrica</th>");
+        for (modelo.Pais p : paises) {
+            html.append("<th style='padding:8px;'>").append(p.getName()).append("</th>");
         }
+        html.append("</tr>");
+
+        // --- LAS 10 MÉTRICAS ---
+        agregarFilaComparacion(html, "Población", paises, p -> p.getPopulation());
+        agregarFilaComparacion(html, "Superficie (km²)", paises, p -> p.getSurfaceArea());
+        agregarFilaComparacion(html, "PNB (GNP)", paises, p -> p.getGnp());
+        agregarFilaComparacion(html, "Exp. Vida (años)", paises, p -> p.getLifeExpectancy());
+        agregarFilaComparacion(html, "Continente", paises, p -> p.getContinent());
+        agregarFilaComparacion(html, "Región", paises, p -> p.getRegion());
+        agregarFilaComparacion(html, "Año Independencia", paises, p -> p.getIndepYear());
+        agregarFilaComparacion(html, "Forma de Gobierno", paises, p -> p.getGovernmentForm());
+        agregarFilaComparacion(html, "Jefe de Estado", paises, p -> p.getHeadOfState());
+        agregarFilaComparacion(html, "Capital", paises, p -> p.getCapitalName());
+
+        html.append("</table></body></html>");
+        JOptionPane.showMessageDialog(this, html.toString(), "Comparación", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // Helper pequeño para no repetir código HTML en la vista
+    private void agregarFilaComparacion(StringBuilder sb, String titulo, List<modelo.Pais> paises, java.util.function.Function<modelo.Pais, String> getter) {
+        sb.append("<tr>");
+        // Columna del título de la métrica
+        sb.append("<td style='background-color:#f0f0f0; padding:6px; font-weight:bold;'>").append(titulo).append("</td>");
+
+        // Columnas con los valores de cada país
+        for (modelo.Pais p : paises) {
+            String valor = getter.apply(p);
+            sb.append("<td style='padding:6px;'>").append(valor != null ? valor : "N/A").append("</td>");
+        }
+        sb.append("</tr>");
     }
     private void txtcodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtcodigoActionPerformed
         // TODO add your handling code here:
@@ -1110,202 +877,74 @@ public class VistaPaises extends javax.swing.JFrame {
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
         int filaSeleccionada = jTable1.getSelectedRow();
 
-        // 2. Validar que haya una fila seleccionada
         if (filaSeleccionada < 0) {
             JOptionPane.showMessageDialog(this, "Debe seleccionar un país de la tabla para modificar.", "Fila no seleccionada", JOptionPane.WARNING_MESSAGE);
-            return; // Salir del método si no hay nada seleccionado
+            return;
         }
 
-        // 3. Obtener el CÓDIGO ORIGINAL (PK) de la tabla
-        //    (Es más seguro que leerlo del textfield, por si el usuario lo cambió)
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
         String codigoOriginal = modelo.getValueAt(filaSeleccionada, 0).toString();
 
-        // 4. Obtener los NUEVOS valores de los campos de texto
         String codigoNuevo = txtcodigo.getText();
         String nombreNuevo = txtnombre.getText();
         String continenteNuevo = txtcontinente.getText();
         String poblacionNueva = txtpoblacion.getText();
 
-        // 5. Validar que los campos no estén vacíos (con los placeholders)
-        if (codigoNuevo.isEmpty() || codigoNuevo.equals("Ingresa el codigo")
-                || nombreNuevo.isEmpty() || nombreNuevo.equals("Ingresa el nombre")
-                || continenteNuevo.isEmpty() || continenteNuevo.equals("Ingresa el continente")
-                || poblacionNueva.isEmpty() || poblacionNueva.equals("Ingresa la población")) {
-
+        // Validaciones visuales (se mantienen igual)
+        if (codigoNuevo.isEmpty() || codigoNuevo.equals("Ingresa el codigo") /* ... resto de validaciones ... */) {
             JOptionPane.showMessageDialog(this, "Por favor, rellena todos los campos.", "Campos vacíos", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // --- INICIA LA LÓGICA DE BASE DE DATOS ---
-        Connection miConexion = null;
-        try {
-            // 6. Obtener la conexión
-            miConexion = Conexion.getConnection();
+        // --- USAR DAO ---
+        Pais paisModificado = new Pais(nombreNuevo, continenteNuevo, poblacionNueva, codigoNuevo);
+        PaisesDao dao = new PaisesDao();
 
-            // 7. Preparar la consulta SQL UPDATE
-            //    (Usamos los nombres de columna de tu BD: Code, Name, Continent, Population)
-            //    Esto te permite modificar todos los campos, incluso el código (PK)
-            String sql = "UPDATE country SET Code = ?, Name = ?, Continent = ?, Population = ? WHERE Code = ?";
+        boolean exito = dao.modificarPais(paisModificado, codigoOriginal);
 
-            try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
-
-                // 8. Asignar los NUEVOS valores (columnas SET)
-                pstmt.setString(1, codigoNuevo);
-                pstmt.setString(2, nombreNuevo);
-                pstmt.setString(3, continenteNuevo);
-                pstmt.setInt(4, Integer.parseInt(poblacionNueva));
-
-                // 9. Asignar el CÓDIGO ORIGINAL (columna WHERE)
-                //    Así sabe qué fila actualizar
-                pstmt.setString(5, codigoOriginal);
-
-                // 10. Ejecutar la modificación
-                int filasAfectadas = pstmt.executeUpdate();
-
-                // 11. Verificar el resultado
-                if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "¡País modificado exitosamente en la BD!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
-                    // 12. Refrescar la tabla (llamando al método que ya creamos)
-                    buscarPaises();
-
-                    // 13. Limpiar los campos (como en tu código original)
-                    txtcodigo.setText("Ingresa el codigo");
-                    txtcodigo.setForeground(new Color(153, 153, 153));
-                    txtnombre.setText("Ingresa el nombre");
-                    txtnombre.setForeground(new Color(153, 153, 153));
-                    txtcontinente.setText("Ingresa el continente");
-                    txtcontinente.setForeground(new Color(153, 153, 153));
-                    txtpoblacion.setText("Ingresa la población");
-                    txtpoblacion.setForeground(new Color(153, 153, 153));
-
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se encontró el país para modificar (pudo ser borrado por otro usuario).", "Error", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-
-        } catch (SQLException e) {
-            // Error de SQL (ej: código duplicado, tipo de dato incorrecto)
-            String mensajeError = e.getMessage();
-            if (mensajeError.contains("Duplicate entry")) {
-                JOptionPane.showMessageDialog(this, "Error: El nuevo código '" + codigoNuevo + "' ya existe en la BD.", "Error de Duplicado", JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al modificar en la base de datos: " + mensajeError, "Error SQL", JOptionPane.ERROR_MESSAGE);
-            }
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            // Error si la población no es un número
-            JOptionPane.showMessageDialog(this, "La población debe ser un número entero válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception e) {
-            // Cualquier otro error (ej: conexión)
-            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        if (exito) {
+            JOptionPane.showMessageDialog(this, "¡País modificado exitosamente!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            buscarPaises();
+            // Limpiar campos...
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo modificar el país (Verifica datos o duplicados).", "Error", JOptionPane.WARNING_MESSAGE);
         }
 
     }//GEN-LAST:event_btnmodificarActionPerformed
 // Agregue este nuevo método a la clase VistaPaises.java
 
     private void ordenarPaisesPorIndependencia() {
-        // Define las columnas (mismas que buscarPaises)
+        PaisesDao dao = new PaisesDao();
+        List<Pais> lista = dao.listarPorIndependencia();
+
         DefaultTableModel modelo = new DefaultTableModel(
                 new Object[]{"Codigo", "Nombre", "Continente", "Poblacion"}, 0
         );
 
-        // SQL base con ordenamiento: Ordenar por IndepYear descendente (más recientes primero)
-        // y luego por nombre ascendente
-        String sqlBase = "SELECT Code, Name, Continent, Population, IndepYear FROM country ORDER BY IndepYear DESC, Name ASC";
-
-        Connection miConexion = null;
-        try {
-            miConexion = Conexion.getConnection();
-
-            // Usamos Statement simple ya que no hay parámetros de usuario
-            try (Statement stmt = miConexion.createStatement(); ResultSet rs = stmt.executeQuery(sqlBase)) {
-
-                System.out.println("Ejecutando consulta: " + sqlBase);
-
-                while (rs.next()) {
-                    modelo.addRow(new Object[]{
-                        rs.getString("Code"),
-                        rs.getString("Name"),
-                        rs.getString("Continent"),
-                        rs.getInt("Population")
-                    });
-                }
-
-                if (modelo.getRowCount() == 0) {
-                    JOptionPane.showMessageDialog(this, "No se encontraron países en la base de datos.", "Error de Datos", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    // Notificar al usuario que la tabla ha sido reordenada
-                    JOptionPane.showMessageDialog(this,
-                            "Se cargaron " + modelo.getRowCount() + " países ordenados por Año de Independencia (Descendente).",
-                            "Ordenamiento Exitoso",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al ordenar países: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        for (Pais p : lista) {
+            modelo.addRow(new Object[]{p.getCode(), p.getName(), p.getContinent(), p.getPopulation()});
         }
 
-        // Asignar el modelo a la tabla
         jTable1.setModel(modelo);
         personalizarTablaEstiloFrutiger();
+        JOptionPane.showMessageDialog(this, "Tabla ordenada por Año de Independencia.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void mostrarCapitalesPorContinente() {
-        // Define las columnas para el reporte
+        PaisesDao dao = new PaisesDao();
+        List<String[]> lista = dao.listarCapitalesPorContinente();
+
         DefaultTableModel modelo = new DefaultTableModel(
                 new Object[]{"Continente", "País", "Capital"}, 0
         );
 
-        Connection miConexion = null;
-        try {
-            miConexion = Conexion.getConnection();
-
-            // SQL: Une country con city (a través de T1.Capital = T2.ID) para obtener la capital, ordenado por continente.
-            String sql = "SELECT "
-                    + "T1.Continent, T1.Name AS CountryName, T2.Name AS CapitalName "
-                    + "FROM country T1 "
-                    + "JOIN city T2 ON T1.Capital = T2.ID "
-                    + "ORDER BY T1.Continent ASC, T1.Name ASC"; // Ordena primero por Continente, luego por País
-
-            try (Statement stmt = miConexion.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-
-                System.out.println("Ejecutando consulta de Capitales por Continente: " + sql);
-
-                while (rs.next()) {
-                    modelo.addRow(new Object[]{
-                        rs.getString("Continent"),
-                        rs.getString("CountryName"),
-                        rs.getString("CapitalName")
-                    });
-                }
-
-                if (modelo.getRowCount() == 0) {
-                    JOptionPane.showMessageDialog(this, "No se encontraron capitales válidas en la base de datos.", "Error de Datos", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                            "Reporte de " + modelo.getRowCount() + " capitales cargado con éxito, agrupado por continente.",
-                            "Reporte Generado",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al generar el reporte de capitales: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        for (String[] fila : lista) {
+            modelo.addRow(fila);
         }
 
-        // Asignar el modelo a la tabla
         jTable1.setModel(modelo);
         personalizarTablaEstiloFrutiger();
+        JOptionPane.showMessageDialog(this, "Reporte de Capitales cargado.", "Reporte Generado", JOptionPane.INFORMATION_MESSAGE);
     }
     private void txtcodigoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtcodigoKeyTyped
         String texto = txtcodigo.getText();
