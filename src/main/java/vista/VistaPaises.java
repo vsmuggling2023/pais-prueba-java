@@ -38,6 +38,8 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import modelo.Pais;
+import java.util.List;
 
 /**
  *
@@ -138,127 +140,118 @@ public class VistaPaises extends javax.swing.JFrame {
      * en los campos de texto y actualiza la jTable.
      */
     private void buscarPaises() {
-        // Define las columnas para el modelo de la tabla
+        // 1. Define las columnas para el modelo de la tabla
         DefaultTableModel modelo = new DefaultTableModel(
                 new Object[]{"Codigo", "Nombre", "Continente", "Poblacion"}, 0
         );
 
-        // 1. Prepara la consulta SQL base
-        // (Asegúrate que los nombres de columna sean 'Code', 'Name', etc. como en tu BD)
         String sqlBase = "SELECT Code, Name, Continent, Population FROM country";
 
-        // Listas para construir la consulta dinámica de forma segura
+        // Listas para filtros (tu lógica original se mantiene igual aquí)
         ArrayList<String> conditions = new ArrayList<>();
         ArrayList<Object> params = new ArrayList<>();
 
-        // 2. Recoge los textos de los campos
         String codigo = txtcodigo.getText();
         String nombre = txtnombre.getText();
         String continente = txtcontinente.getText();
         String poblacion = txtpoblacion.getText();
 
         try {
-            // 3. Añade condiciones SÓLO si el campo está lleno
-
-            // Si el campo 'codigo' no está vacío ni es el placeholder
+            // --- TU LÓGICA DE FILTROS (se mantiene igual) ---
             if (!codigo.isEmpty() && !codigo.equals("Ingresa el codigo")) {
-                conditions.add("Code LIKE ?"); // Buscar por código
-                params.add(codigo + "%");      // Parámetro para 'Code'
+                conditions.add("Code LIKE ?");
+                params.add(codigo + "%");
             }
-
-            // Si el campo 'nombre' no está vacío...
             if (!nombre.isEmpty() && !nombre.equals("Ingresa el nombre")) {
-                conditions.add("Name LIKE ?"); // Buscar por nombre
-                params.add("%" + nombre + "%");  // Parámetro para 'Name' (con comodines)
+                conditions.add("Name LIKE ?");
+                params.add("%" + nombre + "%");
             }
-
-            // Si el campo 'continente' no está vacío...
             if (!continente.isEmpty() && !continente.equals("Ingresa el continente")) {
-                conditions.add("Continent LIKE ?"); // Buscar por continente
-                params.add("%" + continente + "%"); // Parámetro para 'Continent'
+                conditions.add("Continent LIKE ?");
+                params.add("%" + continente + "%");
             }
-
-            // Si el campo 'poblacion' no está vacío...
             if (!poblacion.isEmpty() && !poblacion.equals("Ingresa la población")) {
-                conditions.add("Population >= ?"); // Buscar población MAYOR O IGUAL que
-                params.add(Integer.parseInt(poblacion)); // Parámetro numérico
+                conditions.add("Population >= ?");
+                params.add(Integer.parseInt(poblacion));
             }
 
-            // 4. Construye la consulta final
             if (!conditions.isEmpty()) {
-                // Si hay al menos una condición, une todas con " AND "
                 sqlBase += " WHERE " + String.join(" AND ", conditions);
             }
+            sqlBase += " LIMIT 100";
+            // ------------------------------------------------
 
-            sqlBase += " LIMIT 100"; // Limitar a 100 resultados
-
-            // 5. Ejecuta la consulta
             Connection miConexion = Conexion.getConnection();
 
-            // Usamos PreparedStatement para insertar los parámetros de forma segura
-            try (PreparedStatement pstmt = miConexion.prepareStatement(sqlBase)) {
+           
+            List<Pais> listaDePaises = new ArrayList<>();
 
-                // Asigna los valores de la lista 'params' a la consulta
+            try (PreparedStatement pstmt = miConexion.prepareStatement(sqlBase)) {
                 for (int i = 0; i < params.size(); i++) {
                     pstmt.setObject(i + 1, params.get(i));
                 }
 
-                // Ejecuta la consulta y obtén los resultados
                 try (ResultSet rs = pstmt.executeQuery()) {
-
-                    System.out.println("Ejecutando consulta: " + pstmt.toString());
-
-                    // 6. Recorre los resultados y llena el modelo de la tabla
+                   
                     while (rs.next()) {
-                        modelo.addRow(new Object[]{
-                            rs.getString("Code"),
-                            rs.getString("Name"),
-                            rs.getString("Continent"),
-                            rs.getInt("Population")
-                        });
-                    }
+                        
+                        String codeBD = rs.getString("Code");
+                        String nameBD = rs.getString("Name");
+                        String contBD = rs.getString("Continent");
+                       
+                        String pobBD = String.valueOf(rs.getInt("Population"));
 
-                    if (modelo.getRowCount() == 0) {
-                        System.out.println("No se encontraron resultados para la búsqueda.");
-                    } else {
-                        System.out.println(modelo.getRowCount() + " países cargados.");
+                        
+                        Pais miPais = new Pais(nameBD, contBD, pobBD, codeBD);
+
+                       
+                        listaDePaises.add(miPais);
                     }
                 }
             }
 
+            
+            for (Pais p : listaDePaises) {
+                modelo.addRow(new Object[]{
+                    p.getCodigo(), 
+                    p.getNombre(),
+                    p.getContinente(),
+                    p.getPoblacion()
+                });
+            }
+
+           
+            System.out.println("Se procesaron " + listaDePaises.size() + " objetos Pais.");
+
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La población debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "La población debe ser un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error SQL: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
 
-        // 7. Asigna el modelo (lleno o vacío) a la tabla
         jTable1.setModel(modelo);
-        // Vuelve a aplicar el estilo Frutiger a la tabla (importante)
         personalizarTablaEstiloFrutiger();
     }
 
     public class EjemploConsulta {
 
         public void consultarPaises() {
-            // 1. Obtienes la conexión estática
+            
             Connection miConexion = Conexion.getConnection();
 
-            // Verificas que la conexión no sea nula
+            
             if (miConexion != null) {
 
-                // 2. Escribes tu consulta a la tabla 'country'
+                
                 String sql = "SELECT Name, Continent, Population FROM country WHERE Continent = 'South America'";
 
                 try (Statement stmt = miConexion.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
                     System.out.println("--- Países de Sudamérica en la BD 'world' ---");
 
-                    // 3. Recorres los resultados
+                    
                     while (rs.next()) {
                         String nombre = rs.getString("Name");
                         String continente = rs.getString("Continent");
@@ -271,8 +264,7 @@ public class VistaPaises extends javax.swing.JFrame {
                     System.out.println("❌ Error al ejecutar la consulta SQL");
                     e.printStackTrace();
                 }
-                // (Opcional) Puedes cerrar la conexión cuando tu app se cierre
-                // Conexion.closeConnection();
+                
             }
         }
     }
@@ -740,37 +732,35 @@ public class VistaPaises extends javax.swing.JFrame {
             return; // Salir si algo falta
         }
 
-        // --- INICIA LA LÓGICA DE BASE DE DATOS ---
+        // 
         Connection miConexion = null;
         try {
-            // 3. Obtener la conexión
+            // 
             miConexion = Conexion.getConnection();
 
-            // 4. Preparar la consulta SQL (¡Usa los nombres de columna de tu BD!)
-            // (Asumo que son 'Code', 'Name', 'Continent', 'Population' de la BD 'world')
+
             String sql = "INSERT INTO country (Code, Name, Continent, Population) VALUES (?, ?, ?, ?)";
 
-            // 5. Usar PreparedStatement para insertar datos de forma segura
+       
             try (java.sql.PreparedStatement pstmt = miConexion.prepareStatement(sql)) {
 
-                // 6. Asignar los valores a los '?'
-                pstmt.setString(1, codigo);      // El 'Code' (ej: "CHL")
-                pstmt.setString(2, nombre);      // El 'Name'
-                pstmt.setString(3, continente);  // El 'Continent'
-                pstmt.setInt(4, Integer.parseInt(poblacion)); // La 'Population'
+               
+                pstmt.setString(1, codigo);      
+                pstmt.setString(2, nombre);      
+                pstmt.setString(3, continente);  
+                pstmt.setInt(4, Integer.parseInt(poblacion)); // 
 
-                // 7. Ejecutar la inserción
+               
                 int filasAfectadas = pstmt.executeUpdate();
 
-                // 8. Verificar si la inserción fue exitosa
+                
                 if (filasAfectadas > 0) {
                     JOptionPane.showMessageDialog(this, "¡País agregado exitosamente a la base de datos!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
-                    // 9. Actualizar la tabla visual
-                    // (Llama al método de búsqueda que hicimos antes para refrescar)
+                  
                     buscarPaises();
 
-                    // 10. Limpiar los campos de texto
+              
                     txtcodigo.setText("Ingresa el codigo");
                     txtcodigo.setForeground(new Color(153, 153, 153));
                     txtnombre.setText("Ingresa el nombre");
